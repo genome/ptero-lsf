@@ -3,6 +3,8 @@ import simplejson
 import os
 import unittest
 
+__all__ = ['BaseAPITest']
+
 
 class BaseAPITest(unittest.TestCase):
     __metaclass__ = abc.ABCMeta
