@@ -10,7 +10,7 @@ class TestJobSideEffects(ImmediateAPITest):
         output_file = tempfile.NamedTemporaryFile()
 
         post_data = {
-            'command_line': ['/usr/bin/env'], #, '>>', output_file.name],
+            'command_line': ['/usr/bin/env'],
             'environment': environment,
             'stdout': output_file.name,
         }
