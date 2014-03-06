@@ -12,13 +12,10 @@ class ShellCommandTask(celery.Task):
     def run(self, command_line, environment=None, stderr=None, stdin=None,
             stdout=None, callbacks=None):
 
-        try:
-            with open_files(stderr, stdin, stdout) as (err_fh, in_fh, out_fh):
-                p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                        stderr=err_fh, stdin=in_fh, stdout=out_fh)
-            return {'exit_code': p.wait()}
-        except Exception as e:
-            print 'omg', e
+        with open_files(stderr, stdin, stdout) as (err_fh, in_fh, out_fh):
+            p = subprocess.Popen(command_line, env=environment, close_fds=True,
+                    stderr=err_fh, stdin=in_fh, stdout=out_fh)
+        return {'exit_code': p.wait()}
 
 
 @contextlib.contextmanager
