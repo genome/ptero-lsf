@@ -1,12 +1,18 @@
-from ptero_shell_command_fork.api import application
+import abc
 import simplejson
 import os
 import unittest
 
 
 class APITest(unittest.TestCase):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def create_wsgi_app(self):
+        pass  # pragma: no cover
+
     def setUp(self):
-        self.app = application.create_app()
+        self.app = self.create_wsgi_app()
         self.client = self.app.test_client()
 
     def get(self, url, **kwargs):
