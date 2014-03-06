@@ -4,7 +4,7 @@ import os
 import unittest
 
 
-class APITest(unittest.TestCase):
+class BaseAPITest(unittest.TestCase):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
