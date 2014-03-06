@@ -5,6 +5,9 @@
 This project provides a way for the PTero workflow system to run shell commands
 using [Celery](http://www.celeryproject.org/) via a REST API.
 
+The API is currently described
+[here](https://github.com/mark-burnett/ptero-apis/blob/master/shell-command-fork.md).
+
 
 ## Testing
 
