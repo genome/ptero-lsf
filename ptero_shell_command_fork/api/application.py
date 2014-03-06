@@ -6,8 +6,8 @@ import flask
 __all__ = ['create_app']
 
 
-def create_app():
-    factory = Factory()
+def create_app(celery_configuration=None):
+    factory = Factory(celery_configuration=celery_configuration)
     app = _create_app_from_blueprints()
 
     _attach_factory_to_app(factory, app)
