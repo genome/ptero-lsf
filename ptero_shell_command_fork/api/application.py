@@ -1,5 +1,5 @@
 from . import v1
-from ..implementation.factory import Factory
+from ..implementation import Factory
 import flask
 
 

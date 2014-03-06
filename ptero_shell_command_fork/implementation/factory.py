@@ -1,5 +1,7 @@
 from . import backend
 
+__all__ = ['Factory']
+
 
 class Factory(object):
     def __init__(self):
