@@ -8,7 +8,8 @@ class Backend(object):
     def cleanup(self):
         pass
 
-    def create_job(self, command_line, environment={}, stdout=None):
+    def create_job(self, command_line, environment={}, logging=None):
         task = self.celery_app.tasks[
 'ptero_shell_command_fork.implementation.celery_tasks.shell_command.ShellCommandTask'
-            ].delay(command_line, environment=environment, stdout=stdout)
+            ].delay(command_line, environment=environment,
+                    logging_configuration=logging)

@@ -12,7 +12,14 @@ class TestJobSideEffects(ImmediateAPITest):
         post_data = {
             'command_line': ['/usr/bin/env'],
             'environment': environment,
-            'stdout': output_file.name,
+            'logging': {
+                'stdout': [
+                    {
+                        'type': 'file',
+                        'path': output_file.name,
+                    },
+                ],
+            },
         }
 
         self.post('/v1/jobs', post_data)

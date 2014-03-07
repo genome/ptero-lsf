@@ -1,62 +1,82 @@
 import celery
-import contextlib
-import errno
+import logging
 import os
 import subprocess
-import sys
 
 __all__ = ['ShellCommandTask']
 
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, environment=None, stderr=None, stdin=None,
-            stdout=None, callbacks=None):
+    def run(self, command_line, environment=None, logging_configuration=None,
+            stderr=None, stdin=None, stdout=None, callbacks=None):
+        stdout_logger, stderr_logger = _get_data_loggers(logging_configuration)
 
-        with open_files(stderr, stdin, stdout) as (err_fh, in_fh, out_fh):
-            p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                    stderr=err_fh, stdin=in_fh, stdout=out_fh)
-        return {'exit_code': p.wait()}
+        p = subprocess.Popen(command_line, env=environment, close_fds=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # XXX We cannot use communicate for real, because communicate buffers
+        # the data in memory until the process ends.
+        stdout_data, stderr_data = p.communicate()
+        stdout_logger.log_data(stdout_data)
+        stderr_logger.log_data(stderr_data)
+
+        exit_code = p.wait()
+
+        remaining_stdout, remaining_stderr = p.communicate()
+
+        return {'exit_code': exit_code}
 
 
-@contextlib.contextmanager
-def open_files(stderr, stdin, stdout):
-    make_path_to(stderr)
-    make_path_to(stdout)
-    make_path_to(stdin)
+class NullLogger(object):
+    def log_data(self, data):
+        pass
 
-    stderr_fh = None
-    stdin_fh = None
-    stdout_fh = None
-    try:
-        if stderr:
-            stderr_fh = open(stderr, 'a')
-        if stdin:
-            stdin_fh = open(stdin, 'r')
-        if stdout:
-            stdout_fh = open(stdout, 'a')
-        else:
-            stdout_fh = sys.stderr
+class DataLogger(object):
+    def __init__(self, loggers):
+        self.loggers = loggers
+        self.buf = ''
 
-        yield stderr_fh, stdin_fh, stdout_fh
+    def log_data(self, data):
+        lines = data.split('\n')
+        lines[0] = self.buf + lines[0]
+        for line in lines[:-1]:
+            for logger in self.loggers:
+                logger.info(line)
+        self.buf = lines[-1]
 
-    finally:
-        if stderr_fh:
-            stderr_fh.close()
-        if stdin_fh:
-            stdin_fh.close()
-        if stdout_fh:
-            stdout_fh.close()
 
-def make_path_to(filename):
-    if filename:
-        if os.path.dirname(filename):
-            mkdir_p(os.path.dirname(filename))
+def _get_data_loggers(configuration):
+    if 'stderr' in configuration:
+        stderr_logger = DataLogger(
+                _get_low_level_loggers(configuration['stderr']))
+    else:
+        stderr_logger = NullLogger()
 
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc: # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else: raise
+    if 'stdout' in configuration:
+        stdout_logger = DataLogger(
+                _get_low_level_loggers(configuration['stdout']))
+    else:
+        stdout_logger = NullLogger()
 
+    return stdout_logger, stderr_logger
+
+
+def _get_file_logger(path=None, format_string='%(message)s', type=None):
+    logger = logging.Logger(name='something')
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(path)
+    handler.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    handler.setFormatter(logging.Formatter(format_string))
+
+    return logger
+
+_LOGGER_FACTORIES = {
+    'file': _get_file_logger,
+}
+def _get_low_level_loggers(configurations):
+    result = []
+    for config in configurations:
+        result.append(_LOGGER_FACTORIES[config['type']](**config))
+
+    return result
