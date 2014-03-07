@@ -44,6 +44,9 @@ class DataLogger(object):
 
 
 def _get_data_loggers(configuration):
+    if configuration is None:
+        return NullLogger(), NullLogger()
+
     if 'stderr' in configuration:
         stderr_logger = DataLogger(
                 _get_low_level_loggers(configuration['stderr']))
