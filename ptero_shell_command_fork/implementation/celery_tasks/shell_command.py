@@ -22,8 +22,6 @@ class ShellCommandTask(celery.Task):
 
         exit_code = p.wait()
 
-        remaining_stdout, remaining_stderr = p.communicate()
-
         return {'exit_code': exit_code}
 
 
