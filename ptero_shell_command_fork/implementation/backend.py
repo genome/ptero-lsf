@@ -13,3 +13,5 @@ class Backend(object):
 'ptero_shell_command_fork.implementation.celery_tasks.shell_command.ShellCommandTask'
             ].delay(command_line, environment=environment,
                     logging_configuration=logging)
+
+        return task.id
