@@ -48,6 +48,20 @@ class DeferredAPITest(BaseAPITest):
     def start_worker(self):
         self._workers.append(self._create_new_worker())
 
+    def wait(self):
+        time.sleep(self._wait_sleep_time)
+
+    @property
+    def _wait_sleep_time(self):
+        if self._running_on_ci_server:
+            return 10
+        else:
+            return 5
+
+    @property
+    def _running_on_ci_server(self):
+        return 'TRAVIS' in os.environ
+
     def stop_workers(self):
         self._terminate_workers()
         time.sleep(_TERMINATE_WAIT_TIME)

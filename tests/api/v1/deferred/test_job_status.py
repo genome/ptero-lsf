@@ -1,5 +1,4 @@
 from .base import DeferredAPITest
-import time
 
 
 class JobStatusTest(DeferredAPITest):
@@ -8,7 +7,7 @@ class JobStatusTest(DeferredAPITest):
 
         post_response = self.post('/v1/jobs',
                 {'command_line': ['true']})
-        time.sleep(10)
+        self.wait()
 
         get_response = self.get(post_response.headers['Location'])
         self.assertEqual('succeeded', get_response.DATA['status'])
