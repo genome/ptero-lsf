@@ -6,8 +6,14 @@ import flask
 __all__ = ['create_app']
 
 
-def create_app(celery_configuration=None):
+def create_app(celery_configuration=None, purge=False):
     factory = Factory(celery_configuration=celery_configuration)
+
+    if purge:  # This is used to create a clean test environment.
+        factory.purge()
+    else:
+        pass  # pragma: no cover
+
     app = _create_app_from_blueprints()
 
     _attach_factory_to_app(factory, app)

@@ -13,4 +13,8 @@ class JobListView(Resource):
 
 class JobView(Resource):
     def get(self, pk):
-        return {'status': 'succeeded'}
+        status = g.backend.get_job_status(pk)
+        if status is not None:
+            return {'status': status}
+        else:
+            return '', 404
