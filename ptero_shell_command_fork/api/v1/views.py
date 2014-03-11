@@ -17,4 +17,4 @@ class JobView(Resource):
         if status is not None:
             return {'status': status}
         else:
-            return '', 404
+            return {'message': 'Job not found.'}, 404
