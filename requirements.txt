@@ -5,4 +5,5 @@ librabbitmq
 python-dateutil
 python-statsd
 redis
+requests
 simplejson

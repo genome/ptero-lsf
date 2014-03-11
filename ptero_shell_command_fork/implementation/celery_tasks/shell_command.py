@@ -10,6 +10,7 @@ class ShellCommandTask(celery.Task):
     def run(self, command_line, environment=None, logging_configuration=None,
             stderr=None, stdin=None, stdout=None, callbacks=None):
         stdout_logger, stderr_logger = _get_data_loggers(logging_configuration)
+        self.callback('begun', callbacks)
 
         p = subprocess.Popen(command_line, env=environment, close_fds=True,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -23,6 +24,19 @@ class ShellCommandTask(celery.Task):
         exit_code = p.wait()
 
         return {'exit_code': exit_code}
+
+    def callback(self, status, callbacks):
+        if callbacks is None:
+            return
+
+        if status in callbacks:
+            task = self._get_http_task()
+            task.delay(callbacks[status], status)
+
+    def _get_http_task(self):
+        return celery.current_app.tasks[
+'ptero_shell_command_fork.implementation.celery_tasks.http_callback.HTTPCallbackTask'
+        ]
 
 
 class NullLogger(object):
