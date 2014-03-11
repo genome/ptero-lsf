@@ -29,9 +29,12 @@ def _job_status_from_task(task):
     if task is None:
         return None
 
-    if task.successful:
+    state = task.state
+    if state == 'SUCCESS':
         result = task.result
         if result.get('exit_code') == 0:
             return 'succeeded'
         else:
             return 'failed'
+    elif state == 'STARTED':
+        return 'running'
