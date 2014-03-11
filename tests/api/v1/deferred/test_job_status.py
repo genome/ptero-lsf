@@ -7,7 +7,7 @@ class JobStatusTest(DeferredAPITest):
         self.start_worker()
 
         post_response = self.post('/v1/jobs',
-                {'command_line': ['/usr/bin/true']})
+                {'command_line': ['true']})
         time.sleep(10)
 
         get_response = self.get(post_response.headers['Location'])
