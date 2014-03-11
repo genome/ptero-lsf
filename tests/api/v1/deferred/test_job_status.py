@@ -8,7 +8,7 @@ class JobStatusTest(DeferredAPITest):
 
         post_response = self.post('/v1/jobs',
                 {'command_line': ['/usr/bin/true']})
-        time.sleep(5)
+        time.sleep(10)
 
         get_response = self.get(post_response.headers['Location'])
         self.assertEqual('succeeded', get_response.DATA['status'])
