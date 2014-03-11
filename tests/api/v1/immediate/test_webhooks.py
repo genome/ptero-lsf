@@ -94,3 +94,53 @@ class TestWebhooks(WebhookTestBase):
             {'status': 'begun'},
         ]
         self.assertEqual(expected_data, webhook_data)
+
+    def test_succeeded_webhook(self):
+        self.start_webserver([200])
+
+        post_response = self.post('/v1/jobs', {
+            'command_line': ['true'],
+            'callbacks': {
+                'succeeded': self.webhook_url,
+            },
+        })
+
+        webhook_data = self.stop_webserver()
+        expected_data = [
+            {'status': 'succeeded'},
+        ]
+        self.assertEqual(expected_data, webhook_data)
+
+    def test_failed_webhook(self):
+        self.start_webserver([200])
+
+        post_response = self.post('/v1/jobs', {
+            'command_line': ['false'],
+            'callbacks': {
+                'failed': self.webhook_url,
+            },
+        })
+
+        webhook_data = self.stop_webserver()
+        expected_data = [
+            {'status': 'failed'},
+        ]
+        self.assertEqual(expected_data, webhook_data)
+
+    def test_multiple_webhooks(self):
+        self.start_webserver([200, 200])
+
+        post_response = self.post('/v1/jobs', {
+            'command_line': ['true'],
+            'callbacks': {
+                'begun': self.webhook_url,
+                'succeeded': self.webhook_url,
+            },
+        })
+
+        webhook_data = self.stop_webserver()
+        expected_data = [
+            {'status': 'begun'},
+            {'status': 'succeeded'},
+        ]
+        self.assertEqual(expected_data, webhook_data)

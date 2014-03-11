@@ -23,6 +23,11 @@ class ShellCommandTask(celery.Task):
 
         exit_code = p.wait()
 
+        if exit_code == 0:
+            self.callback('succeeded', callbacks)
+        else:
+            self.callback('failed', callbacks)
+
         return {'exit_code': exit_code}
 
     def callback(self, status, callbacks):
