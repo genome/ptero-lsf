@@ -25,10 +25,13 @@ class Backend(object):
 
         return _job_status_from_task(task)
 
-_JOB_STATUS_FROM_TASK_STATUS = {
-    'SUCCESS': 'succeeded',
-}
 def _job_status_from_task(task):
     if task is None:
         return None
-    return _JOB_STATUS_FROM_TASK_STATUS[task.status]
+
+    if task.successful:
+        result = task.result
+        if result.get('exit_code') == 0:
+            return 'succeeded'
+        else:
+            return 'failed'
