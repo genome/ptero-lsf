@@ -36,5 +36,9 @@ def _job_status_from_task(task):
             return 'succeeded'
         else:
             return 'failed'
+
     elif state == 'STARTED':
         return 'running'
+
+    elif state == 'PENDING':
+        return 'pending'

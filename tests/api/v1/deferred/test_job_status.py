@@ -33,3 +33,9 @@ class JobStatusTest(DeferredAPITest):
 
         get_response = self.get(post_response.headers['Location'])
         self.assertEqual('running', get_response.DATA['status'])
+
+    def test_created_job_has_pending_status(self):
+        post_response = self.post('/v1/jobs', {'command_line': ['true']})
+
+        get_response = self.get(post_response.headers['Location'])
+        self.assertEqual('pending', get_response.DATA['status'])
