@@ -101,13 +101,13 @@ class TestWebhooks(WebhookTestBase):
         post_response = self.post('/v1/jobs', {
             'command_line': ['true'],
             'callbacks': {
-                'succeeded': self.webhook_url,
+                'ended': self.webhook_url,
             },
         })
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'succeeded'},
+            {'status': 'ended', 'exit_code': 0, 'stdout': '', 'stderr': ''},
         ]
         self.assertEqual(expected_data, webhook_data)
 
@@ -117,13 +117,13 @@ class TestWebhooks(WebhookTestBase):
         post_response = self.post('/v1/jobs', {
             'command_line': ['false'],
             'callbacks': {
-                'failed': self.webhook_url,
+                'ended': self.webhook_url,
             },
         })
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'failed'},
+            {'status': 'ended', 'exit_code': 1, 'stdout': '', 'stderr': ''},
         ]
         self.assertEqual(expected_data, webhook_data)
 
@@ -134,13 +134,44 @@ class TestWebhooks(WebhookTestBase):
             'command_line': ['true'],
             'callbacks': {
                 'begun': self.webhook_url,
-                'succeeded': self.webhook_url,
+                'ended': self.webhook_url,
             },
         })
 
         webhook_data = self.stop_webserver()
         expected_data = [
             {'status': 'begun'},
-            {'status': 'succeeded'},
+            {'status': 'ended', 'exit_code': 0, 'stdout': '', 'stderr': ''},
         ]
         self.assertEqual(expected_data, webhook_data)
+
+    def test_environment_set_for_job(self):
+        self.start_webserver([200])
+        environment = {
+            'FOO': 'bar',
+        }
+
+        post_data = {
+            'command_line': ['/usr/bin/env'],
+            'environment': environment,
+            'callbacks': {
+                'ended': self.webhook_url,
+            },
+        }
+
+        self.post('/v1/jobs', post_data)
+
+        webhook_data = self.stop_webserver()
+
+        stdout = webhook_data[0]['stdout']
+        actual_environment = _extract_environment_dict(stdout)
+
+        self.assertEqual(environment, actual_environment)
+
+def _extract_environment_dict(stdin):
+    result = {}
+    for line in stdin.split('\n'):
+        if line:
+            key, value = line.split('=')
+            result[key] = value.strip('\n')
+    return result

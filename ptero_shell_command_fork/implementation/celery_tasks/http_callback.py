@@ -6,10 +6,8 @@ __all__ = ['HTTPCallbackTask']
 
 
 class HTTPCallbackTask(celery.Task):
-    def run(self, url, status):
-        requests.put(url, self.body(status))
+    def run(self, url, **kwargs):
+        requests.put(url, self.body(kwargs))
 
-    def body(self, status):
-        return simplejson.dumps({
-            'status': status,
-        })
+    def body(self, kwargs):
+        return simplejson.dumps(kwargs)
