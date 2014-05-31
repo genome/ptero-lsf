@@ -192,6 +192,24 @@ class TestWebhooks(WebhookTestBase):
 
         self.assertEqual(environment, actual_environment)
 
+    def test_stdin_stdout_pass_through(self):
+        self.start_webserver([200])
+        stdin = 'this is just some text'
+
+        post_data = {
+            'command_line': ['cat'],
+            'stdin': stdin,
+            'callbacks': {
+                'ended': self.webhook_url,
+            },
+        }
+
+        self.post('/v1/jobs', post_data)
+
+        webhook_data = self.stop_webserver()
+        self.assertEqual(stdin, webhook_data[0]['stdout'])
+
+
 def _extract_environment_dict(stdin):
     result = {}
     for line in stdin.split('\n'):

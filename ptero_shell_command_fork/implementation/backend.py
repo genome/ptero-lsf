@@ -17,7 +17,7 @@ class Backend(object):
     def create_job(self, command_line, environment={}, stdin=None,
             callbacks=None):
         task = self.shell_command.delay(command_line, environment=environment,
-                stdin=None, callbacks=callbacks)
+                stdin=stdin, callbacks=callbacks)
 
         return task.id
 
