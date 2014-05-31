@@ -6,7 +6,7 @@ __all__ = ['ShellCommandTask']
 
 class ShellCommandTask(celery.Task):
     def run(self, command_line, environment=None, stdin=None, callbacks=None):
-        self.callback('begun', callbacks)
+        self.callback('begun', callbacks, job_id=self.request.id)
 
         p = subprocess.Popen(command_line, env=environment, close_fds=True,
                 stdin=subprocess.PIPE,
@@ -19,7 +19,8 @@ class ShellCommandTask(celery.Task):
         exit_code = p.wait()
 
         self.callback('ended', callbacks, exit_code=exit_code,
-                stdout=stdout_data, stderr=stderr_data)
+                stdout=stdout_data, stderr=stderr_data,
+                job_id=self.request.id)
 
         return {'exit_code': exit_code}
 

@@ -91,7 +91,10 @@ class TestWebhooks(WebhookTestBase):
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'begun'},
+            {
+                'status': 'begun',
+                'job_id': post_response.DATA['job_id'],
+            },
         ]
         self.assertEqual(expected_data, webhook_data)
 
@@ -107,7 +110,13 @@ class TestWebhooks(WebhookTestBase):
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'ended', 'exit_code': 0, 'stdout': '', 'stderr': ''},
+            {
+                'status': 'ended',
+                'exit_code': 0,
+                'stdout': '',
+                'stderr': '',
+                'job_id': post_response.DATA['job_id'],
+            },
         ]
         self.assertEqual(expected_data, webhook_data)
 
@@ -123,7 +132,13 @@ class TestWebhooks(WebhookTestBase):
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'ended', 'exit_code': 1, 'stdout': '', 'stderr': ''},
+            {
+                'status': 'ended',
+                'exit_code': 1,
+                'stdout': '',
+                'stderr': '',
+                'job_id': post_response.DATA['job_id'],
+            },
         ]
         self.assertEqual(expected_data, webhook_data)
 
@@ -140,8 +155,17 @@ class TestWebhooks(WebhookTestBase):
 
         webhook_data = self.stop_webserver()
         expected_data = [
-            {'status': 'begun'},
-            {'status': 'ended', 'exit_code': 0, 'stdout': '', 'stderr': ''},
+            {
+                'status': 'begun',
+                'job_id': post_response.DATA['job_id'],
+            },
+            {
+                'status': 'ended',
+                'exit_code': 0,
+                'stdout': '',
+                'stderr': '',
+                'job_id': post_response.DATA['job_id'],
+            },
         ]
         self.assertEqual(expected_data, webhook_data)
 
