@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
-import argparse
 from flask import Flask, request
+import argparse
+import signal
 
 
 _RESPONSE_CODES = []
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=5112)
+    parser.add_argument('--stop-after', type=int, default=10)
     parser.add_argument('--response-codes', nargs='+', type=int)
 
     arguments = parser.parse_args()
@@ -18,7 +20,11 @@ def parse_arguments():
     return arguments
 
 def next_response_code():
-    return _RESPONSE_CODES.pop()
+    response_code = _RESPONSE_CODES.pop()
+    if not _RESPONSE_CODES:
+        shutdown_server()
+    return response_code
+
 
 app = Flask(__name__)
 
@@ -29,6 +35,14 @@ def log_request():
     return '', next_response_code()
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+
 if __name__ == '__main__':
     arguments = parse_arguments()
+    signal.alarm(arguments.stop_after)
     app.run(port=arguments.port)

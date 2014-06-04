@@ -24,6 +24,7 @@ class WebhookTestBase(ImmediateAPITest):
             raise RuntimeError('Cannot start multiple webservers in one test')
         command_line = ['python', self._webserver_path,
                 '--port', str(self._webserver_port),
+                '--stop-after', str(self._webserver_timeout),
                 '--response-codes']
         command_line.extend(map(str, response_codes))
         self._webserver = subprocess.Popen(command_line,
@@ -32,7 +33,6 @@ class WebhookTestBase(ImmediateAPITest):
 
     def stop_webserver(self):
         if self._webserver is not None:
-            self._kill_webserver()
             stdout, stderr = self._webserver.communicate()
             self._webserver = None
             if stdout:
@@ -47,20 +47,13 @@ class WebhookTestBase(ImmediateAPITest):
     def _wait_for_webserver(self):
         time.sleep(1)
 
-    def _kill_webserver(self):
-        self._webserver.send_signal(signal.SIGINT)
-
-        time.sleep(_TERMINATE_WAIT_TIME)
-
-        try:
-            self._webserver.kill()
-        except OSError as e:
-            if e.errno != 3:  # errno 3: no such pid
-                raise
-
     @property
     def _webserver_path(self):
         return os.path.join(os.path.dirname(__file__), 'logging_webserver.py')
+
+    @property
+    def _webserver_timeout(self):
+        return 10
 
     @property
     def _webserver_port(self):
