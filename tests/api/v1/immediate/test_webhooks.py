@@ -22,7 +22,9 @@ class WebhookTestBase(ImmediateAPITest):
     def start_webserver(self, response_codes):
         if self._webserver:
             raise RuntimeError('Cannot start multiple webservers in one test')
-        command_line = ['python', self._webserver_path]
+        command_line = ['python', self._webserver_path,
+                '--port', str(self._webserver_port),
+                '--response-codes']
         command_line.extend(map(str, response_codes))
         self._webserver = subprocess.Popen(command_line,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)

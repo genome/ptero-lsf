@@ -7,12 +7,15 @@ from flask import Flask, request
 _RESPONSE_CODES = []
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('response_codes', nargs='+', type=int)
+    parser.add_argument('--port', type=int, default=5112)
+    parser.add_argument('--response-codes', nargs='+', type=int)
 
     arguments = parser.parse_args()
 
     global _RESPONSE_CODES
     _RESPONSE_CODES = list(reversed(arguments.response_codes))
+
+    return arguments
 
 def next_response_code():
     return _RESPONSE_CODES.pop()
@@ -27,5 +30,5 @@ def log_request():
 
 
 if __name__ == '__main__':
-    parse_arguments()
-    app.run(port=5112)
+    arguments = parse_arguments()
+    app.run(port=arguments.port)
