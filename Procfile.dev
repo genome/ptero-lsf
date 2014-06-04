@@ -1,4 +1,4 @@
 rabbit: rabbitmq-server
 redis: redis-server --port $REDIS_PORT
-worker: celery worker --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
 web: gunicorn -b $PTERO_FORK_HOST:$PTERO_FORK_PORT ptero_shell_command_fork.api.wsgi:app
+worker: celery worker --concurrency 4 -A ptero_shell_command_fork.implementation.celery_app
