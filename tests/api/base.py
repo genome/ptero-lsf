@@ -17,6 +17,10 @@ class BaseAPITest(unittest.TestCase):
         self.app = self.create_wsgi_app()
         self.client = self.app.test_client()
 
+    @property
+    def jobs_url(self):
+        return '/v1/jobs'
+
     def get(self, url, **kwargs):
         return _deserialize_response(self.client.get(url, query_string=kwargs))
 

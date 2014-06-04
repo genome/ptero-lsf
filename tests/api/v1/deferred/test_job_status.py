@@ -6,7 +6,7 @@ class JobStatusTest(DeferredAPITest):
     def test_successful_job_has_succeeded_status(self):
         self.start_worker()
 
-        post_response = self.post('/v1/jobs',
+        post_response = self.post(self.jobs_url,
                 {'command_line': ['true']})
         self.wait()
 
@@ -16,7 +16,7 @@ class JobStatusTest(DeferredAPITest):
     def test_failed_job_has_failed_status(self):
         self.start_worker()
 
-        post_response = self.post('/v1/jobs',
+        post_response = self.post(self.jobs_url,
                 {'command_line': ['false']})
         self.wait()
 
@@ -27,7 +27,7 @@ class JobStatusTest(DeferredAPITest):
         self.start_worker()
         self.wait()
 
-        post_response = self.post('/v1/jobs',
+        post_response = self.post(self.jobs_url,
                 {'command_line': ['sleep', '30']})
         time.sleep(2)
 
@@ -36,6 +36,7 @@ class JobStatusTest(DeferredAPITest):
 
     def test_created_job_has_pending_status(self):
         post_response = self.post('/v1/jobs', {'command_line': ['true']})
+        post_response = self.post(self.jobs_url, {'command_line': ['true']})
 
         get_response = self.get(post_response.headers['Location'])
         self.assertEqual('pending', get_response.DATA['status'])

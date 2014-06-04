@@ -77,7 +77,7 @@ class TestWebhooks(WebhookTestBase):
     def test_begun_webhook(self):
         self.start_webserver([200])
 
-        post_response = self.post('/v1/jobs', {
+        post_response = self.post(self.jobs_url, {
             'command_line': ['true'],
             'callbacks': {
                 'begun': self.webhook_url,
@@ -96,7 +96,7 @@ class TestWebhooks(WebhookTestBase):
     def test_succeeded_webhook(self):
         self.start_webserver([200])
 
-        post_response = self.post('/v1/jobs', {
+        post_response = self.post(self.jobs_url, {
             'command_line': ['true'],
             'callbacks': {
                 'ended': self.webhook_url,
@@ -118,7 +118,7 @@ class TestWebhooks(WebhookTestBase):
     def test_failed_webhook(self):
         self.start_webserver([200])
 
-        post_response = self.post('/v1/jobs', {
+        post_response = self.post(self.jobs_url, {
             'command_line': ['false'],
             'callbacks': {
                 'ended': self.webhook_url,
@@ -140,7 +140,7 @@ class TestWebhooks(WebhookTestBase):
     def test_multiple_webhooks(self):
         self.start_webserver([200, 200])
 
-        post_response = self.post('/v1/jobs', {
+        post_response = self.post(self.jobs_url, {
             'command_line': ['true'],
             'callbacks': {
                 'begun': self.webhook_url,
@@ -178,7 +178,7 @@ class TestWebhooks(WebhookTestBase):
             },
         }
 
-        self.post('/v1/jobs', post_data)
+        self.post(self.jobs_url, post_data)
 
         webhook_data = self.stop_webserver()
 
@@ -199,7 +199,7 @@ class TestWebhooks(WebhookTestBase):
             },
         }
 
-        self.post('/v1/jobs', post_data)
+        self.post(self.jobs_url, post_data)
 
         webhook_data = self.stop_webserver()
         self.assertEqual(stdin, webhook_data[0]['stdout'])
