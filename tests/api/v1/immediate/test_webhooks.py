@@ -147,7 +147,7 @@ class TestWebhooks(BaseAPITest):
         self.assertEqual(stdin, webhook_data[0]['stdout'])
 
 
-class JobStatusTest(BaseAPITest):
+class TestJobStatus(BaseAPITest):
     def test_successful_job_has_succeeded_status(self):
         self.start_webserver([200])
 
