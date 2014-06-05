@@ -1,4 +1,4 @@
-from .base import ImmediateAPITest
+from ...base import BaseAPITest
 import os
 import signal
 import simplejson
@@ -9,13 +9,13 @@ import time
 _TERMINATE_WAIT_TIME = 0.1
 
 
-class WebhookTestBase(ImmediateAPITest):
+class WebhookTestBase(BaseAPITest):
     def setUp(self):
-        super(ImmediateAPITest, self).setUp()
+        super(WebhookTestBase, self).setUp()
         self._webserver = None
 
     def tearDown(self):
-        super(ImmediateAPITest, self).tearDown()
+        super(WebhookTestBase, self).tearDown()
         self.stop_webserver()
 
 
