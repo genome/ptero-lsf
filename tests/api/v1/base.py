@@ -9,31 +9,24 @@ import unittest
 __all__ = ['BaseAPITest']
 
 
-class BaseAPITest(unittest.TestCase):
-    __metaclass__ = abc.ABCMeta
-
-    def setUp(self):
-        self.api_host = os.environ.setdefault('PTERO_FORK_HOST', 'localhost')
-        self.api_port = os.environ.setdefault('PTERO_FORK_PORT', '5200')
+class CallbackServer:
+    def __init__(self, response_codes):
+        self._response_codes = response_codes
         self._webserver = None
 
-    def tearDown(self):
-        self.stop_webserver()
-
-
-    def start_webserver(self, response_codes):
+    def start(self):
         if self._webserver:
             raise RuntimeError('Cannot start multiple webservers in one test')
-        command_line = ['python', self._webserver_path,
-                '--port', str(self._webserver_port),
-                '--stop-after', str(self._webserver_timeout),
+        command_line = ['python', self._path,
+                '--port', str(self._port),
+                '--stop-after', str(self._timeout),
                 '--response-codes']
-        command_line.extend(map(str, response_codes))
+        command_line.extend(map(str, self._response_codes))
         self._webserver = subprocess.Popen(command_line,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self._wait_for_webserver()
+        self._wait()
 
-    def stop_webserver(self):
+    def stop(self):
         if self._webserver is not None:
             stdout, stderr = self._webserver.communicate()
             self._webserver = None
@@ -41,25 +34,36 @@ class BaseAPITest(unittest.TestCase):
                 return map(simplejson.loads, stdout.split('\n')[:-1])
         return []
 
-    def _wait_for_webserver(self):
+    def _wait(self):
         time.sleep(1)
 
     @property
-    def webhook_url(self):
-        return 'http://localhost:%d/' % self._webserver_port
+    def url(self):
+        return 'http://localhost:%d/' % self._port
 
     @property
-    def _webserver_path(self):
+    def _path(self):
         return os.path.join(os.path.dirname(__file__), 'logging_webserver.py')
 
     @property
-    def _webserver_timeout(self):
+    def _timeout(self):
         return 10
 
     @property
-    def _webserver_port(self):
+    def _port(self):
         return 5112
 
+class BaseAPITest(unittest.TestCase):
+    __metaclass__ = abc.ABCMeta
+
+    def setUp(self):
+        self.api_host = os.environ.setdefault('PTERO_FORK_HOST', 'localhost')
+        self.api_port = os.environ.setdefault('PTERO_FORK_PORT', '5200')
+
+    def create_callback_server(self, response_codes):
+        server = CallbackServer(response_codes)
+        server.start()
+        return server
 
     @property
     def jobs_url(self):

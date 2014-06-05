@@ -4,12 +4,12 @@ import simplejson
 
 class TestMockWebserver(BaseAPITest):
     def test_mock_webserver_works(self):
-        self.start_webserver([302])
+        callback_server = self.create_callback_server([302])
         import requests
         request_body = {"bob": "hi im your friend"}
-        response = requests.put(self.webhook_url,
+        response = requests.put(callback_server.url,
                 simplejson.dumps(request_body))
         self.assertEqual(302, response.status_code)
 
-        datas = self.stop_webserver()
+        datas = callback_server.stop()
         self.assertEqual(request_body, datas[0])
