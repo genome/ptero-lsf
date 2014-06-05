@@ -1,66 +1,8 @@
 from ..base import BaseAPITest
-import os
-import signal
 import simplejson
-import subprocess
-import time
 
 
-_TERMINATE_WAIT_TIME = 0.1
-
-
-class WebhookTestBase(BaseAPITest):
-    def setUp(self):
-        super(WebhookTestBase, self).setUp()
-        self._webserver = None
-
-    def tearDown(self):
-        super(WebhookTestBase, self).tearDown()
-        self.stop_webserver()
-
-
-    def start_webserver(self, response_codes):
-        if self._webserver:
-            raise RuntimeError('Cannot start multiple webservers in one test')
-        command_line = ['python', self._webserver_path,
-                '--port', str(self._webserver_port),
-                '--stop-after', str(self._webserver_timeout),
-                '--response-codes']
-        command_line.extend(map(str, response_codes))
-        self._webserver = subprocess.Popen(command_line,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self._wait_for_webserver()
-
-    def stop_webserver(self):
-        if self._webserver is not None:
-            stdout, stderr = self._webserver.communicate()
-            self._webserver = None
-            if stdout:
-                return map(simplejson.loads, stdout.split('\n')[:-1])
-        return []
-
-    @property
-    def webhook_url(self):
-        return 'http://localhost:%d/' % self._webserver_port
-
-
-    def _wait_for_webserver(self):
-        time.sleep(1)
-
-    @property
-    def _webserver_path(self):
-        return os.path.join(os.path.dirname(__file__), 'logging_webserver.py')
-
-    @property
-    def _webserver_timeout(self):
-        return 10
-
-    @property
-    def _webserver_port(self):
-        return 5112
-
-
-class TestMockWebserver(WebhookTestBase):
+class TestMockWebserver(BaseAPITest):
     def test_mock_webserver_works(self):
         self.start_webserver([302])
         import requests
@@ -73,7 +15,7 @@ class TestMockWebserver(WebhookTestBase):
         self.assertEqual(request_body, datas[0])
 
 
-class TestWebhooks(WebhookTestBase):
+class TestWebhooks(BaseAPITest):
     def test_begun_webhook(self):
         self.start_webserver([200])
 
@@ -205,7 +147,7 @@ class TestWebhooks(WebhookTestBase):
         self.assertEqual(stdin, webhook_data[0]['stdout'])
 
 
-class JobStatusTest(WebhookTestBase):
+class JobStatusTest(BaseAPITest):
     def test_successful_job_has_succeeded_status(self):
         self.start_webserver([200])
 
