@@ -18,13 +18,13 @@ class CallbackServer:
         if self._webserver:
             raise RuntimeError('Cannot start multiple webservers in one test')
         command_line = ['python', self._path,
-                '--port', str(self._port),
                 '--stop-after', str(self._timeout),
                 '--response-codes']
         command_line.extend(map(str, self._response_codes))
         self._webserver = subprocess.Popen(command_line,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self._wait()
+        self._port = int(self._webserver.stderr.readline().rstrip())
 
     def stop(self):
         if self._webserver is not None:
@@ -49,9 +49,6 @@ class CallbackServer:
     def _timeout(self):
         return 10
 
-    @property
-    def _port(self):
-        return 5112
 
 class BaseAPITest(unittest.TestCase):
     __metaclass__ = abc.ABCMeta
