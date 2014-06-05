@@ -1,4 +1,4 @@
-from ...base import BaseAPITest
+from ..base import BaseAPITest
 import os
 import signal
 import simplejson
