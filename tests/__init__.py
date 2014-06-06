@@ -44,6 +44,7 @@ def setUp():
         instance = subprocess.Popen(service_command_line(),
                 shell=False, stdout=outlog, stderr=errlog)
         time.sleep(wait_time())
+        os.system("ps -efl > var/log/ps-alt.out") # XXX debug
         if instance.poll():
             raise RuntimeError("honcho instance terminated prematurely")
 

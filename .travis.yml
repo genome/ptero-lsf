@@ -8,7 +8,7 @@ script: tox
 after_script:
     - ls -lh .coverage*
     - ps -efl > var/log/ps.out
-    - cat var/log/*
+    - bash -c 'for f in var/log/*; do echo; echo "============================================"; echo $f; echo "============================================"; cat $f; done'
 
 after_success:
     - pip install coveralls
