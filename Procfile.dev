@@ -1,6 +1,6 @@
 rabbit: rabbitmq-server
 redis: redis-server --port $REDIS_PORT
-web: gunicorn -b $PTERO_FORK_HOST:$PTERO_FORK_PORT ptero_shell_command_fork.api.wsgi:app
+web: gunicorn --access-logfile - -b $PTERO_FORK_HOST:$PTERO_FORK_PORT ptero_shell_command_fork.api.wsgi:app
 worker1: celery worker -n worker1.%h --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
 worker2: celery worker -n worker2.%h --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
 worker3: celery worker -n worker3.%h --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
