@@ -24,13 +24,14 @@ def wait_time():
 
 def setUp():
     mkdir_p('logs')
-    loghandle = open('logs/honcho.out', 'w')
+    outlog = open('logs/honcho.out', 'w')
+    errlog = open('logs/honcho.err', 'w')
     global instance
 
     if not os.environ.get('SKIP_PROCFILE'):
         instance = subprocess.Popen(
                 ['honcho', '-f', 'Procfile.dev', 'start'],
-                shell=False, stdout=loghandle)
+                shell=False, stdout=outlog, stderr=errlog)
         time.sleep(wait_time())
         if instance.poll():
             raise RuntimeError("honcho instance terminated prematurely")
