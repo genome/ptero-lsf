@@ -20,9 +20,11 @@ def term_handler(signum, frame):
             child_process.kill()
 
     signal.signal(signal.SIGALRM, kill_child)
-    signal.alarm(5)
+    signal.alarm(4)
 
+signal.signal(signal.SIGINT, term_handler)
 signal.signal(signal.SIGTERM, term_handler)
+
 
 while True:
     time.sleep(LOOP_PERIOD)
