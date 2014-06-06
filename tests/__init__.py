@@ -23,10 +23,12 @@ def wait_time():
         return 2
 
 def setUp():
-    mkdir_p('logs')
-    outlog = open('logs/honcho.out', 'w')
-    errlog = open('logs/honcho.err', 'w')
     global instance
+
+    logdir = 'var/log'
+    mkdir_p(logdir)
+    outlog = open(os.path.join(logdir, 'honcho.out'), 'w')
+    errlog = open(os.path.join(logdir, 'honcho.err'), 'w')
 
     if not os.environ.get('SKIP_PROCFILE'):
         instance = subprocess.Popen(
