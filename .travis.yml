@@ -5,7 +5,9 @@ install: pip install tox
 
 script: tox
 
-after_script: cat var/log/*
+after_script:
+    - cat var/log/*
+    - ls -lh .coverage*
 
 after_success:
     - pip install coveralls
