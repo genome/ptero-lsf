@@ -5,7 +5,7 @@ install: pip install tox
 
 script: tox
 
-after_failure: cat logs/honcho.out
+after_failure: cat var/log/*
 
 after_success:
     - pip install coveralls
