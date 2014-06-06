@@ -1,16 +1,9 @@
 language: python
 python: "2.7"
 
-install:
-    - pip install tox
-    - pip install honcho
+install: pip install honcho tox
 
-services:
-    - rabbitmq
-    - redis
-
-script:
-    - tox
+script: tox
 
 after_success:
     - pip install coveralls
