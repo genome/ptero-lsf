@@ -22,6 +22,16 @@ def wait_time():
     else:
         return 2
 
+
+def procfile_path():
+    return os.path.join(os.path.dirname(__file__),
+            'scripts', 'Procfile')
+
+
+def service_command_line():
+    return ['honcho', '-f', procfile_path(), 'start']
+
+
 def setUp():
     global instance
 
@@ -31,8 +41,7 @@ def setUp():
     errlog = open(os.path.join(logdir, 'honcho.err'), 'w')
 
     if not os.environ.get('SKIP_PROCFILE'):
-        instance = subprocess.Popen(
-                ['honcho', '-f', 'Procfile.dev', 'start'],
+        instance = subprocess.Popen(service_command_line(),
                 shell=False, stdout=outlog, stderr=errlog)
         time.sleep(wait_time())
         if instance.poll():
