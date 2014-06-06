@@ -67,4 +67,5 @@ def get_children(pid):
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
     children = get_children(instance.pid)
+    reap_processes(children)
     instance.send_signal(signal.SIGINT)
