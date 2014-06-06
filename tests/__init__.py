@@ -1,29 +1,34 @@
+import errno
 import os
 import signal
 import subprocess
 import sys
 import time
 
-instances = {}
+instance = None
 
-_TERMINATE_WAIT_TIME = 0.1
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 def setUp():
-    DEVNULL = open(os.devnull, 'wb')
-
-    procfile = 'Procfile.dev'
-    if os.environ.get('TRAVIS'):
-        procfile = 'Procfile'
+    mkdir_p('logs')
+    loghandle = open('logs/honcho.out', 'w')
+    global instance
 
     if not os.environ.get('SKIP_PROCFILE'):
-        instances['honcho'] = subprocess.Popen(
-                ['honcho', '-f', procfile, 'start'],
-                shell=False, stdout=DEVNULL, stderr=DEVNULL)
+        instance = subprocess.Popen(
+                ['honcho', '-f', 'Procfile.dev', 'start'],
+                shell=False, stdout=loghandle)
         time.sleep(2)
-        if instances['honcho'].poll():
-            raise Exception("honcho instance terminated prematurely")
+        if instance.poll():
+            raise RuntimeError("honcho instance terminated prematurely")
 
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
-    for instance in instances.values():
-        instance.send_signal(signal.SIGINT)
+    instance.send_signal(signal.SIGINT)
