@@ -1,4 +1,4 @@
 coverage
 eventlet
-honcho
+git+https://github.com/nickstenning/honcho.git@master#egg=honcho
 nose >= 1.3.0
