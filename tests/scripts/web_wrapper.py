@@ -15,11 +15,12 @@ child_process = subprocess.Popen(['coverage', 'run', webserver_path()])
 def term_handler(signum, frame):
     child_process.send_signal(signal.SIGINT)
 
-    signal.signal(signal.SIGALRM, kill)
-    signal.alarm(5)
+    def kill_child(signum, frame):
+        if child_process.poll() is None:
+            child_process.kill()
 
-    if child_process.poll() is None:
-        child_process.kill()
+    signal.signal(signal.SIGALRM, kill_child)
+    signal.alarm(5)
 
 signal.signal(signal.SIGTERM, term_handler)
 
