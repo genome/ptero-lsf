@@ -49,29 +49,22 @@ def setUp():
         if instance.poll():
             raise RuntimeError("honcho instance terminated prematurely")
 
-def process_exists(process):
-    try:
-        p = psutil.Process(process.pid)
-        return 1
-    except:
-        return 0
 
-def check_processes(cmdlines, processes):
+def reap_processes(processes):
+    if not os.environ.get('TRAVIS'):
+        return
     time.sleep(5)
-    f = open('var/log/pids.out', 'w')
-    f.write("PIDs:\n")
     for p in processes:
-        f.write("%d %s\n" % (process_exists(p), p.pid))
-        for x in cmdlines[p.pid]:
-            f.write("\t%s\n" % x)
-    f.close()
+        if p.is_running():
+            p.terminate()
+            time.sleep(0.1)
+            if p.is_running():
+                p.kill()
+
+def get_children(pid):
+    return psutil.Process(pid).get_children(recursive=True)
 
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
-    p = psutil.Process(instance.pid)
-    children = p.get_children(recursive=True)
-    cmdlines = {} # cache these values
-    for p in children:
-        cmdlines[p.pid] = p.cmdline()
+    children = get_children(instance.pid)
     instance.send_signal(signal.SIGINT)
-    check_processes(cmdlines, children) # XXX debug
