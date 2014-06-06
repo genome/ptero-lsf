@@ -8,6 +8,7 @@ script: tox
 after_script:
     - cat var/log/*
     - ls -lh .coverage*
+    - ps aux
 
 after_success:
     - pip install coveralls
