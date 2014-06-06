@@ -16,6 +16,12 @@ def mkdir_p(path):
         else:
             raise
 
+def wait_time():
+    if os.environ.get('TRAVIS'):
+        return 10
+    else:
+        return 2
+
 def setUp():
     mkdir_p('logs')
     loghandle = open('logs/honcho.out', 'w')
@@ -25,7 +31,7 @@ def setUp():
         instance = subprocess.Popen(
                 ['honcho', '-f', 'Procfile.dev', 'start'],
                 shell=False, stdout=loghandle)
-        time.sleep(2)
+        time.sleep(wait_time())
         if instance.poll():
             raise RuntimeError("honcho instance terminated prematurely")
 
