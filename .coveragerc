@@ -1,6 +1,7 @@
 [run]
-omit = ptero_shell_command_fork/api/wsgi.py
 branch = True
+parallel = True
+source = ptero_shell_command_fork
 
 [report]
 show_missing = True
