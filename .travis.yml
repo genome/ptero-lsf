@@ -3,7 +3,9 @@ python: "2.7"
 
 install: pip install tox
 
-script: tox
+script:
+    - tox
+    - cat logs/honcho.out
 
 after_success:
     - pip install coveralls
