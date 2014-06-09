@@ -91,7 +91,7 @@ def get_descendents():
     return psutil.Process(instance.pid).get_children(recursive=True)
 
 
-# XXX If this doesn't run then honcho will be orphaned...
+# NOTE If this doesn't run then honcho will be orphaned...
 def tearDown():
     if os.environ.get('TRAVIS'):
         travis_ci_cleanup()
