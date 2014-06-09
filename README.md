@@ -15,3 +15,14 @@ To run tests:
 
     pip install tox
     tox
+
+
+## Deveopment
+
+To launch a development server:
+
+    pip install -r requirements.txt
+    pip install honcho
+    honcho start -f Procfile.dev -c worker=4
+
+You can then connect to the webserver at http://localhost:5200
