@@ -22,7 +22,7 @@ def mkdir_p(path):
 
 def wait_time():
     if os.environ.get('TRAVIS'):
-        return 10
+        return 15
     else:
         return 2
 
