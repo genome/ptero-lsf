@@ -52,33 +52,48 @@ def setUp():
             raise RuntimeError("honcho instance terminated prematurely")
 
 
-def reap_processes(processes):
-    if os.environ.get('TRAVIS'):
-        time.sleep(5)
-        for p in processes:
-            try:
-                p.send_signal(signal.SIGINT)
-            except psutil.NoSuchProcess:
-                pass
+def travis_ci_cleanup():
+    grandchildren = get_grandchildren()
+    descendents = get_descendents()
 
-        time.sleep(0.2)
-        for p in processes:
-            try:
-                p.kill()
-            except psutil.NoSuchProcess:
-                pass
+    if not signal_processes(grandchildren, signal.SIGINT):
+        return
+
+    time.sleep(1)
+    if not signal_processes(descendents, signal.SIGINT):
+        return
+
+    time.sleep(3)
+    signal_processes(descendents, signal.SIGKILL)
 
 
-def get_grandchildren(pid):
-    children = psutil.Process(pid).get_children(recursive=False)
+def signal_processes(processes, sig):
+    signaled_someone = False
+    for p in processes:
+        try:
+            p.send_signal(sig)
+            signaled_someone = True
+        except psutil.NoSuchProcess:
+            pass
+
+    return signaled_someone
+
+
+def get_grandchildren():
+    children = psutil.Process(instance.pid).get_children(recursive=False)
     grandchildren = []
     for child in children:
         grandchildren.extend(child.get_children(recursive=False))
     return grandchildren
 
 
+def get_descendents():
+    return psutil.Process(instance.pid).get_children(recursive=True)
+
+
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
-    children = get_grandchildren(instance.pid)
-    reap_processes(children)
+    if os.environ.get('TRAVIS'):
+        travis_ci_cleanup()
+
     instance.send_signal(signal.SIGINT)
