@@ -54,13 +54,17 @@ def reap_processes(processes):
     if os.environ.get('TRAVIS'):
         time.sleep(5)
         for p in processes:
-            if p.is_running():
+            try:
                 p.send_signal(signal.SIGINT)
+            except psutil.NoSuchProcess:
+                pass
 
         time.sleep(0.2)
         for p in processes:
-            if p.is_running():
+            try:
                 p.kill()
+            except psutil.NoSuchProcess:
+                pass
 
 
 def get_children(pid):
