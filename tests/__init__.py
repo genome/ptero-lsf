@@ -48,7 +48,7 @@ def setUp():
         instance = subprocess.Popen(service_command_line(),
                 shell=False, stdout=outlog, stderr=errlog)
         time.sleep(wait_time())
-        if instance.poll():
+        if instance.poll() is not None:
             raise RuntimeError("honcho instance terminated prematurely")
 
 
