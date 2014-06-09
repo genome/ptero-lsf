@@ -7,6 +7,9 @@ import sys
 import time
 
 
+NUM_WORKERS = 4
+
+
 instance = None
 
 
@@ -33,7 +36,8 @@ def procfile_path():
 
 
 def service_command_line():
-    return ['honcho', '-f', procfile_path(), 'start']
+    return ['honcho', '-f', procfile_path(), 'start', '-c',
+            'worker=%s' % NUM_WORKERS]
 
 
 def setUp():
