@@ -5,11 +5,12 @@ install: pip install tox
 
 script:
     - tox
+    - ls -lh .coverage.* > var/log/coverage_files.out
     - pip install coverage
+    - coverage combine
     - coverage report
 
 after_script:
-    - ls -lh .coverage*
     - ps -efl > var/log/ps.out
     - bash -c 'for f in var/log/*; do echo; echo "============================================"; echo $f; echo "============================================"; cat $f; done'
 
