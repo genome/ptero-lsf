@@ -67,12 +67,16 @@ def reap_processes(processes):
                 pass
 
 
-def get_children(pid):
-    return psutil.Process(pid).get_children(recursive=False)
+def get_grandchildren(pid):
+    children = psutil.Process(pid).get_children(recursive=False)
+    grandchildren = []
+    for child in children:
+        grandchildren.extend(child.get_children(recursive=False))
+    return grandchildren
 
 
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
-    children = get_children(instance.pid)
+    children = get_grandchildren(instance.pid)
     reap_processes(children)
     instance.send_signal(signal.SIGINT)
