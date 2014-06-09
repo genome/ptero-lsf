@@ -13,10 +13,6 @@ class Factory(object):
         self._initialize()
         return backend.Backend(celery_app=self.celery_app)
 
-    def purge(self):
-        self._initialize()
-        self.celery_app.control.discard_all()
-
     def _initialize(self):
         # Lazy initialize to be pre-fork friendly.
         if not self._initialized:

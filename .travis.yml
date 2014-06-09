@@ -3,12 +3,11 @@ python: "2.7"
 
 install: pip install tox
 
-services:
-    - rabbitmq
-    - redis
+script: tox
 
-script:
-    - tox
+after_script:
+    - ps -efl > var/log/ps.out
+    - bash -c 'for f in var/log/*; do echo; echo "============================================"; echo $f; echo "============================================"; cat $f; done'
 
 after_success:
     - pip install coveralls
