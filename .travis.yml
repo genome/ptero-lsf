@@ -3,7 +3,12 @@ python: "2.7"
 
 install: pip install tox
 
-script: tox
+script:
+    - tox
+    - ls -lh .coverage.* > var/log/coverage_files.out
+    - coverage combine
+    - coverage report > var/log/coverage_report.out
+
 
 after_script:
     - ls -lh .coverage*
