@@ -51,20 +51,21 @@ def setUp():
 
 
 def reap_processes(processes):
-    if not os.environ.get('TRAVIS'):
-        return
-    time.sleep(5)
-    for p in processes:
-        if p.is_running():
-            p.send_signal(signal.SIGINT)
+    if os.environ.get('TRAVIS'):
+        time.sleep(5)
+        for p in processes:
+            if p.is_running():
+                p.send_signal(signal.SIGINT)
 
-    time.sleep(0.2)
-    for p in processes:
-        if p.is_running():
-            p.kill()
+        time.sleep(0.2)
+        for p in processes:
+            if p.is_running():
+                p.kill()
+
 
 def get_children(pid):
     return psutil.Process(pid).get_children(recursive=True)
+
 
 # XXX If this doesn't run then honcho will be orphaned...
 def tearDown():
