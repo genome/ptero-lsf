@@ -56,10 +56,12 @@ def reap_processes(processes):
     time.sleep(5)
     for p in processes:
         if p.is_running():
-            p.terminate()
-            time.sleep(0.1)
-            if p.is_running():
-                p.kill()
+            p.send_signal(signal.SIGINT)
+
+    time.sleep(0.2)
+    for p in processes:
+        if p.is_running():
+            p.kill()
 
 def get_children(pid):
     return psutil.Process(pid).get_children(recursive=True)
