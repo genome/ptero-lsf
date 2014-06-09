@@ -7,6 +7,9 @@ import sys
 import time
 
 
+NUM_WORKERS = 4
+
+
 instance = None
 
 
@@ -33,7 +36,8 @@ def procfile_path():
 
 
 def service_command_line():
-    return ['honcho', '-f', procfile_path(), 'start']
+    return ['honcho', '-f', procfile_path(), 'start', '-c',
+            'worker=%s' % NUM_WORKERS]
 
 
 def setUp():
@@ -93,7 +97,8 @@ def get_descendents():
 
 # NOTE If this doesn't run then honcho will be orphaned...
 def tearDown():
-    if os.environ.get('TRAVIS'):
-        travis_ci_cleanup()
+    if not os.environ.get('SKIP_PROCFILE'):
+        if os.environ.get('TRAVIS'):
+            travis_ci_cleanup()
 
-    instance.send_signal(signal.SIGINT)
+        instance.send_signal(signal.SIGINT)
