@@ -97,7 +97,8 @@ def get_descendents():
 
 # NOTE If this doesn't run then honcho will be orphaned...
 def tearDown():
-    if os.environ.get('TRAVIS'):
-        travis_ci_cleanup()
+    if not os.environ.get('SKIP_PROCFILE'):
+        if os.environ.get('TRAVIS'):
+            travis_ci_cleanup()
 
-    instance.send_signal(signal.SIGINT)
+        instance.send_signal(signal.SIGINT)
