@@ -68,7 +68,7 @@ def reap_processes(processes):
 
 
 def get_children(pid):
-    return psutil.Process(pid).get_children(recursive=False)
+    return psutil.Process(pid).get_children(recursive=True)
 
 
 # XXX If this doesn't run then honcho will be orphaned...
