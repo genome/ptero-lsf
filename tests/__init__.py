@@ -6,7 +6,9 @@ import subprocess
 import sys
 import time
 
+
 instance = None
+
 
 def mkdir_p(path):
     try:
@@ -16,6 +18,7 @@ def mkdir_p(path):
             pass
         else:
             raise
+
 
 def wait_time():
     if os.environ.get('TRAVIS'):
