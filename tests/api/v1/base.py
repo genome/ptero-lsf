@@ -54,8 +54,8 @@ class BaseAPITest(unittest.TestCase):
     __metaclass__ = abc.ABCMeta
 
     def setUp(self):
-        self.api_host = os.environ.setdefault('PTERO_FORK_HOST', 'localhost')
-        self.api_port = os.environ.setdefault('PTERO_FORK_PORT', '5200')
+        self.api_host = os.environ['PTERO_FORK_HOST']
+        self.api_port = os.environ['PTERO_FORK_PORT']
 
     def create_callback_server(self, response_codes):
         server = CallbackServer(response_codes)

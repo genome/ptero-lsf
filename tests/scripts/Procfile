@@ -1,4 +1,4 @@
-rabbit: RABBITMQ_LOG_BASE=$PWD/$RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE=$PWD/$RABBITMQ_MNESIA_BASE rabbitmq-server
-redis: redis-server --port $REDIS_PORT
-web: python tests/scripts/web_wrapper.py
-worker: coverage run $(which celery) worker -n shell_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
+rabbit: RABBITMQ_LOG_BASE=$PWD/$PTERO_FORK_RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE=$PWD/$PTERO_FORK_RABBITMQ_MNESIA_BASE RABBITMQ_NODENAME=$PTERO_FORK_RABBITMQ_NODENAME RABBITMQ_NODE_PORT=$PTERO_FORK_RABBITMQ_NODE_PORT rabbitmq-server
+redis: redis-server --port $PTERO_FORK_REDIS_PORT
+web: CELERY_BROKER_URL=$PTERO_FORK_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_FORK_CELERY_RESULT_BACKEND python tests/scripts/web_wrapper.py
+worker: CELERY_BROKER_URL=$PTERO_FORK_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_FORK_CELERY_RESULT_BACKEND coverage run $(which celery) worker -n shell_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_shell_command_fork.implementation.celery_app
