@@ -33,10 +33,10 @@ def this_dir():
     return os.path.dirname(__file__)
 
 def procfile_path():
-    return os.path.join(thisdir(), 'scripts', 'Procfile')
+    return os.path.join(this_dir(), 'scripts', 'Procfile')
 
 def env_path():
-    return os.path.join(thisdir(), 'scripts', 'environment.txt')
+    return os.path.join(this_dir(), 'scripts', 'environment.txt')
 
 def service_command_line():
     return ['honcho', '-f', procfile_path(), '-e', env_path(), 'start',
