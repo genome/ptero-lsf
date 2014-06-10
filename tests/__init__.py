@@ -29,14 +29,14 @@ def wait_time():
     else:
         return 2
 
-def relative_path(*args):
-    return os.path.join(os.path.dirname(__file__), *args)
+def this_dir():
+    return os.path.dirname(__file__)
 
 def procfile_path():
-    return relative_path('scripts', 'Procfile')
+    return os.path.join(thisdir(), 'scripts', 'Procfile')
 
 def env_path():
-    return relative_path('scripts', 'env.sh')
+    return os.path.join(thisdir(), 'scripts', 'environment.txt')
 
 def service_command_line():
     return ['honcho', '-f', procfile_path(), '-e', env_path(), 'start',
