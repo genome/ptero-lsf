@@ -72,7 +72,11 @@ def cleanup():
     descendents = get_descendents()
 
     instance.send_signal(signal.SIGINT)
-    instance.wait(timeout=2)
+    try:
+        instance.wait(timeout=2)
+    except psutil.TimeoutExpired:
+        instance.send_signal(signal.SIGTERM)
+        instance.wait(timeout=3)
 
     if not signal_processes(descendents, signal.SIGINT):
         return
