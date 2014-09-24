@@ -17,7 +17,7 @@ def create_app(celery_configuration=None):
 
 
 def _create_app_from_blueprints():
-    app = flask.Flask('PTero Fork Shell Command Service')
+    app = flask.Flask('PTero Shell Command Service')
     app.register_blueprint(v1.blueprint, url_prefix='/v1')
 
     return app

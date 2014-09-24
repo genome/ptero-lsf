@@ -2,8 +2,8 @@ import celery
 import os
 
 
-app = celery.Celery('PTero-fork-celery',
-        include='ptero_shell_command_fork.implementation.celery_tasks')
+app = celery.Celery('PTero-shell-command-celery',
+        include='ptero_shell_command.implementation.celery_tasks')
 
 
 _DEFAULT_CELERY_CONFIG = {
