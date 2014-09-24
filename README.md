@@ -1,12 +1,12 @@
-# PTero Shell Command Fork Service
-[![Build Status](https://travis-ci.org/mark-burnett/ptero-shell-command-fork.png?branch=master)](https://travis-ci.org/mark-burnett/ptero-shell-command-fork)
-[![Coverage Status](https://coveralls.io/repos/mark-burnett/ptero-shell-command-fork/badge.png)](https://coveralls.io/r/mark-burnett/ptero-shell-command-fork)
+# PTero Shell Command Service
+[![Build Status](https://travis-ci.org/genome/ptero-shell-command.png?branch=master)](https://travis-ci.org/genome/ptero-shell-command)
+[![Coverage Status](https://coveralls.io/repos/genome/ptero-shell-command/badge.png)](https://coveralls.io/r/genome/ptero-shell-command)
 
 This project provides a way for the PTero workflow system to run shell commands
 using [Celery](http://www.celeryproject.org/) via a REST API.
 
 The API is currently described
-[here](https://github.com/mark-burnett/ptero-apis/blob/master/shell-command-fork.md).
+[here](https://github.com/genome/ptero-apis/blob/master/shell-command.md).
 
 
 ## Testing
