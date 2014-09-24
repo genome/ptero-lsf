@@ -1,6 +1,7 @@
 *.pyc
 /*.egg
 /*.egg-info
-/.coverage
+/.coverage*
 /.tox
 /var
+rabbit@localhost.pid
