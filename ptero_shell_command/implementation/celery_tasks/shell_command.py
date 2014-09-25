@@ -34,5 +34,5 @@ class ShellCommandTask(celery.Task):
 
     def _get_http_task(self):
         return celery.current_app.tasks[
-'ptero_shell_command_fork.implementation.celery_tasks.http_callback.HTTPCallbackTask'
+'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]

@@ -11,7 +11,7 @@ class Backend(object):
     @property
     def shell_command(self):
         return self.celery_app.tasks[
-'ptero_shell_command_fork.implementation.celery_tasks.shell_command.ShellCommandTask'
+'ptero_shell_command.implementation.celery_tasks.shell_command.ShellCommandTask'
         ]
 
     def create_job(self, command_line, environment={}, stdin=None,

@@ -1,4 +1,0 @@
-rabbit: RABBITMQ_LOG_BASE=$PWD/$RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE=$PWD/$RABBITMQ_MNESIA_BASE rabbitmq-server
-redis: redis-server --port $REDIS_PORT
-web: gunicorn -b 0.0.0.0:$PTERO_FORK_PORT ptero_shell_command_fork.api.wsgi:app
-worker: celery worker -n shell_worker.%h.$PORT -A ptero_shell_command_fork.implementation.celery_app
