@@ -2,8 +2,18 @@ import celery
 import os
 
 
-app = celery.Celery('PTero-shell-command-celery',
-        include='ptero_shell_command.implementation.celery_tasks')
+TASK_PATH = 'ptero_shell_command.implementation.celery_tasks'
+
+
+app = celery.Celery('PTero-shell-command-celery', include=TASK_PATH)
+
+
+app.conf['CELERY_ROUTES'] = (
+    {
+        TASK_PATH + '.shell_command.ShellCommandTask': {'queue': 'fork'},
+        TASK_PATH + '.http_callback.HTTPCallbackTask': {'queue': 'http'},
+    },
+)
 
 
 _DEFAULT_CELERY_CONFIG = {
@@ -14,7 +24,7 @@ _DEFAULT_CELERY_CONFIG = {
     'CELERY_RESULT_SERIALIZER': 'json',
     'CELERY_TASK_SERIALIZER': 'json',
     'CELERY_TRACK_STARTED': True,
-    'CELERYD_PREFETCH_MULTIPLIER': 1,
+    'CELERYD_PREFETCH_MULTIPLIER': 10,
 }
 for var, default in _DEFAULT_CELERY_CONFIG.iteritems():
     if var in os.environ:
