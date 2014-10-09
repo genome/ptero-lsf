@@ -8,7 +8,7 @@ class JobListView(Resource):
     def post(self):
         data = parsers.get_job_post_data()
         job_id = g.backend.create_job(**data)
-        return {'job_id': job_id}, 201, {'Location': url_for('job', pk=job_id)}
+        return {'jobId': job_id}, 201, {'Location': url_for('job', pk=job_id)}
 
 
 class JobView(Resource):

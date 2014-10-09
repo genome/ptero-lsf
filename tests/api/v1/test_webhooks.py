@@ -7,7 +7,7 @@ class TestWebhooks(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['true'],
+            'commandLine': ['true'],
             'callbacks': {
                 'begun': callback_server.url,
             },
@@ -17,7 +17,7 @@ class TestWebhooks(BaseAPITest):
         expected_data = [
             {
                 'status': 'begun',
-                'job_id': post_response.DATA['job_id'],
+                'jobId': post_response.DATA['jobId'],
             },
         ]
         self.assertEqual(expected_data, webhook_data)
@@ -26,7 +26,7 @@ class TestWebhooks(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['true'],
+            'commandLine': ['true'],
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -36,10 +36,10 @@ class TestWebhooks(BaseAPITest):
         expected_data = [
             {
                 'status': 'ended',
-                'exit_code': 0,
+                'exitCode': 0,
                 'stdout': '',
                 'stderr': '',
-                'job_id': post_response.DATA['job_id'],
+                'jobId': post_response.DATA['jobId'],
             },
         ]
         self.assertEqual(expected_data, webhook_data)
@@ -48,7 +48,7 @@ class TestWebhooks(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['false'],
+            'commandLine': ['false'],
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -58,10 +58,10 @@ class TestWebhooks(BaseAPITest):
         expected_data = [
             {
                 'status': 'ended',
-                'exit_code': 1,
+                'exitCode': 1,
                 'stdout': '',
                 'stderr': '',
-                'job_id': post_response.DATA['job_id'],
+                'jobId': post_response.DATA['jobId'],
             },
         ]
         self.assertEqual(expected_data, webhook_data)
@@ -70,7 +70,7 @@ class TestWebhooks(BaseAPITest):
         callback_server = self.create_callback_server([200, 200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['true'],
+            'commandLine': ['true'],
             'callbacks': {
                 'begun': callback_server.url,
                 'ended': callback_server.url,
@@ -81,14 +81,14 @@ class TestWebhooks(BaseAPITest):
         expected_data = [
             {
                 'status': 'begun',
-                'job_id': post_response.DATA['job_id'],
+                'jobId': post_response.DATA['jobId'],
             },
             {
                 'status': 'ended',
-                'exit_code': 0,
+                'exitCode': 0,
                 'stdout': '',
                 'stderr': '',
-                'job_id': post_response.DATA['job_id'],
+                'jobId': post_response.DATA['jobId'],
             },
         ]
         self.assertEqual(expected_data, webhook_data)
@@ -100,7 +100,7 @@ class TestWebhooks(BaseAPITest):
         }
 
         post_data = {
-            'command_line': ['/usr/bin/env'],
+            'commandLine': ['/usr/bin/env'],
             'environment': environment,
             'callbacks': {
                 'ended': callback_server.url,
@@ -121,7 +121,7 @@ class TestWebhooks(BaseAPITest):
         stdin = 'this is just some text'
 
         post_data = {
-            'command_line': ['cat'],
+            'commandLine': ['cat'],
             'stdin': stdin,
             'callbacks': {
                 'ended': callback_server.url,

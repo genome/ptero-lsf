@@ -7,7 +7,7 @@ class TestJobStatus(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['true'],
+            'commandLine': ['true'],
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -22,7 +22,7 @@ class TestJobStatus(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['false'],
+            'commandLine': ['false'],
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -37,7 +37,7 @@ class TestJobStatus(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         post_response = self.post(self.jobs_url, {
-            'command_line': ['sleep', '10'],
+            'commandLine': ['sleep', '10'],
             'callbacks': {
                 'begun': callback_server.url,
             },
