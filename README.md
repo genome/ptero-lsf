@@ -1,12 +1,12 @@
-# PTero Shell Command Service
-[![Build Status](https://travis-ci.org/genome/ptero-shell-command.png?branch=master)](https://travis-ci.org/genome/ptero-shell-command)
-[![Coverage Status](https://coveralls.io/repos/genome/ptero-shell-command/badge.png)](https://coveralls.io/r/genome/ptero-shell-command)
+# PTero LSF Service
+[![Build Status](https://travis-ci.org/genome/ptero-lsf.png?branch=master)](https://travis-ci.org/genome/ptero-lsf)
+[![Coverage Status](https://coveralls.io/repos/genome/ptero-lsf/badge.png)](https://coveralls.io/r/genome/ptero-lsf)
 
-This project provides a way for the PTero workflow system to run shell commands
-using [Celery](http://www.celeryproject.org/) via a REST API.
+This project provides a way for the PTero workflow system to run commands via
+LSF using [Celery](http://www.celeryproject.org/) via a REST API.
 
 The API is currently described
-[here](https://github.com/genome/ptero-apis/blob/master/shell-command.md).
+[here](https://github.com/genome/ptero-apis/blob/master/lsf.md).
 
 
 ## Testing
