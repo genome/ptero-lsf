@@ -66,7 +66,7 @@ def signal_processes(processes, sig):
     return signaled_someone
 
 def get_descendents():
-    return psutil.Process(instance.pid).get_children(recursive=True)
+    return psutil.Process(instance.pid).children(recursive=True)
 
 def cleanup():
     descendents = get_descendents()
