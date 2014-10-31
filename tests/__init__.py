@@ -2,6 +2,7 @@ import errno
 import os
 import psutil
 import signal
+import subprocess
 import sys
 import time
 
@@ -32,7 +33,10 @@ def this_dir():
     return os.path.dirname(__file__)
 
 def procfile_path():
-    return os.path.join(this_dir(), 'scripts', 'Procfile')
+    if os.environ.get('TEST_WITH_ROOT_WORKERS'):
+        return os.path.join(this_dir(), 'scripts', 'Procfile-with-sudo')
+    else:
+        return os.path.join(this_dir(), 'scripts', 'Procfile')
 
 def service_command_line():
     return ['honcho', '-f', procfile_path(), 'start',
@@ -58,12 +62,30 @@ def signal_processes(processes, sig):
     signaled_someone = False
     for p in processes:
         try:
-            p.send_signal(sig)
-            signaled_someone = True
+            if p.uids()[0] == 0:
+                signaled_someone |= sudo_send_signal(p,sig)
+            else:
+                signaled_someone |= send_signal(p,sig)
         except psutil.NoSuchProcess:
             pass
-
     return signaled_someone
+
+def send_signal(process,signal):
+    try:
+        process.send_signal(signal)
+        return True
+    except psutil.NoSuchProcess:
+        pass
+    return False
+
+def sudo_send_signal(process,signal):
+    command = ["sudo", "kill", "-" + str(signal), str(process.pid)]
+    try:
+        subprocess.check_call(command)
+        return True
+    except:
+        pass
+    return False
 
 def get_descendents():
     return psutil.Process(instance.pid).children(recursive=True)
