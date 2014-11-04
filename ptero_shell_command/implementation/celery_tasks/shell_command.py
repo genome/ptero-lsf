@@ -1,14 +1,18 @@
 import celery
 import subprocess
+import os
+import pwd
 
 __all__ = ['ShellCommandTask']
 
+class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, environment=None, stdin=None, callbacks=None):
+    def run(self, command_line, environment=None, stdin=None, callbacks=None, username=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
         p = subprocess.Popen(command_line, env=environment, close_fds=True,
+                preexec_fn=lambda :self._setup_execution_environment(username),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -36,3 +40,10 @@ class ShellCommandTask(celery.Task):
         return celery.current_app.tasks[
 'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
+
+    def _setup_execution_environment(self, username):
+        self._set_user(username)
+
+    def _set_user(self, username):
+        uid = pwd.getpwnam(username)[2]
+        os.setreuid(uid, uid)

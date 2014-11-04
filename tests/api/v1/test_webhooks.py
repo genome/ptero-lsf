@@ -8,6 +8,7 @@ class TestWebhooks(BaseAPITest):
 
         post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
+            'username': self.job_username,
             'callbacks': {
                 'begun': callback_server.url,
             },
@@ -27,6 +28,7 @@ class TestWebhooks(BaseAPITest):
 
         post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
+            'username': self.job_username,
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -49,6 +51,7 @@ class TestWebhooks(BaseAPITest):
 
         post_response = self.post(self.jobs_url, {
             'commandLine': ['false'],
+            'username': self.job_username,
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -71,6 +74,7 @@ class TestWebhooks(BaseAPITest):
 
         post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
+            'username': self.job_username,
             'callbacks': {
                 'begun': callback_server.url,
                 'ended': callback_server.url,
@@ -101,6 +105,7 @@ class TestWebhooks(BaseAPITest):
 
         post_data = {
             'commandLine': ['/usr/bin/env'],
+            'username': self.job_username,
             'environment': environment,
             'callbacks': {
                 'ended': callback_server.url,
@@ -122,6 +127,7 @@ class TestWebhooks(BaseAPITest):
 
         post_data = {
             'commandLine': ['cat'],
+            'username': self.job_username,
             'stdin': stdin,
             'callbacks': {
                 'ended': callback_server.url,

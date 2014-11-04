@@ -66,6 +66,10 @@ class BaseAPITest(unittest.TestCase):
     def jobs_url(self):
         return 'http://%s:%s/v1/jobs' % (self.api_host, self.api_port)
 
+    @property
+    def job_username(self):
+        return os.getlogin()
+
     def get(self, url, **kwargs):
         return _deserialize_response(requests.get(url, params=kwargs))
 
