@@ -32,8 +32,7 @@ def _job_status_from_task(task):
 
     state = task.state
     if state == 'SUCCESS':
-        result = task.result
-        if result.get('exit_code') == 0:
+        if task.result:
             return 'succeeded'
         else:
             return 'failed'
