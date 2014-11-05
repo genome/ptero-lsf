@@ -46,11 +46,16 @@ class ShellCommandTask(celery.Task):
         ]
 
     def _setup_execution_environment(self, username):
-        self._set_user(username)
-
-    def _set_user(self, username):
         try:
-            uid = pwd.getpwnam(username)[2]
-            os.setreuid(uid, uid)
+            pw_ent = pwd.getpwnam(username)
         except KeyError as e:
             raise PreExecFailed(e.message)
+
+        uid = pw_ent[2]
+        self._set_uid(uid)
+
+    def _set_uid(self, uid):
+        try:
+            os.setreuid(uid, uid)
+        except OSError as e:
+            raise PreExecFailed('Failed to setreuid: ' + e.strerror)
