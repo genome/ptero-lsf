@@ -11,6 +11,11 @@ class ShellCommandTask(celery.Task):
     def run(self, command_line, environment=None, stdin=None, callbacks=None, username=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
+        if username == 'root':
+            self.callback('error', callbacks, jobId=self.request.id,
+                errorMessage='Refusing to execute job as root user')
+            return False
+
         try:
             p = subprocess.Popen(command_line, env=environment, close_fds=True,
                 preexec_fn=lambda :self._setup_execution_environment(username),
