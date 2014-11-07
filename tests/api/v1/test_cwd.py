@@ -18,9 +18,9 @@ class TestCwd(BaseAPITest):
         super(TestCwd, self).tearDown()
         os.rmdir( self.job_cwd )
 
-    def test_cwd(self):
+    def test_job_cwd(self):
         callback_server = self.create_callback_server([200])
-        
+
         post_data = {
             'commandLine': ['/bin/pwd'],
             'username': self.job_username,
@@ -29,9 +29,9 @@ class TestCwd(BaseAPITest):
                 'ended': callback_server.url,
             },
         }
-        
+
         self.post(self.jobs_url, post_data)
-        
+
         webhook_data = callback_server.stop()
         actual_cwd = webhook_data[0]['stdout'].strip('\n')
         self.assertEqual(self.job_cwd, actual_cwd)
