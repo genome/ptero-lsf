@@ -8,7 +8,8 @@ __all__ = ['ShellCommandTask']
 class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, environment=None, stdin=None, callbacks=None, umask=None, cwd=None, username=None):
+    def run(self, command_line, umask, username, cwd=None, environment=None,
+        stdin=None, callbacks=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
         if username == 'root':
@@ -18,7 +19,7 @@ class ShellCommandTask(celery.Task):
 
         try:
             p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                preexec_fn=lambda :self._setup_execution_environment(username, umask, cwd),
+                preexec_fn=lambda :self._setup_execution_environment(cwd, umask, username),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -50,7 +51,7 @@ class ShellCommandTask(celery.Task):
 'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
 
-    def _setup_execution_environment(self, username, umask, cwd):
+    def _setup_execution_environment(self, cwd, umask, username):
         self._set_umask(umask)
         try:
             pw_ent = pwd.getpwnam(username)
