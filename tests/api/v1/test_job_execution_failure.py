@@ -7,7 +7,7 @@ class TestJobExecutionFailure(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         user = '_no_such_user'
-        self.post(self.jobs_url, {
+        post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
             'user': user,
             'callbacks': {
@@ -16,6 +16,11 @@ class TestJobExecutionFailure(BaseAPITest):
         })
 
         webhook_data = callback_server.stop()
-        actual_status = webhook_data[0]['status']
-
-        self.assertEqual('error', actual_status)
+        expected_data = [
+            {
+                'status': 'error',
+                'jobId': post_response.DATA['jobId'],
+                'errorMessage': 'getpwnam(): name not found: _no_such_user'
+            }
+        ]
+        self.assertEqual(expected_data, webhook_data)

@@ -9,7 +9,7 @@ class TestForkWorkerRunningWithoutRoot(BaseAPITest):
         callback_server = self.create_callback_server([200])
 
         user = 'nobody'
-        self.post(self.jobs_url, {
+        post_response = self.post(self.jobs_url, {
             'commandLine': ['whoami'],
             'user': user,
             'callbacks': {
@@ -18,5 +18,11 @@ class TestForkWorkerRunningWithoutRoot(BaseAPITest):
         })
 
         webhook_data = callback_server.stop()
-        self.assertEqual('error', webhook_data[0]['status'])
-        self.assertEqual('Failed to setreuid: Operation not permitted', webhook_data[0]['errorMessage'])
+        expected_data = [
+            {
+                'status': 'error',
+                'jobId': post_response.DATA['jobId'],
+                'errorMessage': 'Failed to setreuid: Operation not permitted'
+            }
+        ]
+        self.assertEqual(expected_data, webhook_data)
