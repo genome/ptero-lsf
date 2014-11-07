@@ -1,8 +1,8 @@
 from .base import BaseAPITest
 import os
 import platform
-import tempfile
 import simplejson
+import tempfile
 
 
 class TestCwd(BaseAPITest):

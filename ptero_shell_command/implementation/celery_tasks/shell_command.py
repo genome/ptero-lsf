@@ -1,7 +1,7 @@
 import celery
-import subprocess
 import os
 import pwd
+import subprocess
 
 __all__ = ['ShellCommandTask']
 
