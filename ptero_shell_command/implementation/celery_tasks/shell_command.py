@@ -75,7 +75,8 @@ class ShellCommandTask(celery.Task):
             raise PreExecFailed('Failed to setreuid: ' + e.strerror)
 
     def _set_cwd(self, cwd):
-        try:
-            os.chdir(cwd)
-        except OSError as e:
-            raise PreExecFailed('chdir(%s): %s' % (cwd, e.strerror))
+        if not cwd == None:
+            try:
+                os.chdir(cwd)
+            except OSError as e:
+                raise PreExecFailed('chdir(%s): %s' % (cwd, e.strerror))
