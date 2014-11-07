@@ -67,7 +67,7 @@ class BaseAPITest(unittest.TestCase):
         return 'http://%s:%s/v1/jobs' % (self.api_host, self.api_port)
 
     @property
-    def job_username(self):
+    def job_user(self):
         return os.getlogin()
 
     def get(self, url, **kwargs):

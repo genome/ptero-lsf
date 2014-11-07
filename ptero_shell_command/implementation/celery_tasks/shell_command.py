@@ -8,18 +8,18 @@ __all__ = ['ShellCommandTask']
 class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, umask, username, cwd=None, environment=None,
+    def run(self, command_line, umask, user, cwd=None, environment=None,
         stdin=None, callbacks=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
-        if username == 'root':
+        if user == 'root':
             self.callback('error', callbacks, jobId=self.request.id,
                 errorMessage='Refusing to execute job as root user')
             return False
 
         try:
             p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                preexec_fn=lambda :self._setup_execution_environment(cwd, umask, username),
+                preexec_fn=lambda :self._setup_execution_environment(cwd, umask, user),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -51,10 +51,10 @@ class ShellCommandTask(celery.Task):
 'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
 
-    def _setup_execution_environment(self, cwd, umask, username):
+    def _setup_execution_environment(self, cwd, umask, user):
         self._set_umask(umask)
         try:
-            pw_ent = pwd.getpwnam(username)
+            pw_ent = pwd.getpwnam(user)
         except KeyError as e:
             raise PreExecFailed(e.message)
 

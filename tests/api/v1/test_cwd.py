@@ -23,7 +23,7 @@ class TestCwd(BaseAPITest):
 
         post_data = {
             'commandLine': ['/bin/pwd'],
-            'username': self.job_username,
+            'user': self.job_user,
             'cwd': self.job_cwd,
             'callbacks': {
                 'ended': callback_server.url,
@@ -41,7 +41,7 @@ class TestCwd(BaseAPITest):
 
         post_data = {
             'commandLine': ['/bin/pwd'],
-            'username': self.job_username,
+            'user': self.job_user,
             'cwd': '/does/not/exist',
             'callbacks': {
                 'error': callback_server.url,
@@ -65,7 +65,7 @@ class TestCwd(BaseAPITest):
         os.chmod(self.job_cwd, 0)
         post_data = {
             'commandLine': ['/bin/pwd'],
-            'username': self.job_username,
+            'user': self.job_user,
             'cwd': self.job_cwd,
             'callbacks': {
                 'error': callback_server.url,

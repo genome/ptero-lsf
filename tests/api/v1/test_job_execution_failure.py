@@ -6,10 +6,10 @@ class TestJobExecutionFailure(BaseAPITest):
     def test_exception_on_setuid_failure(self):
         callback_server = self.create_callback_server([200])
 
-        username = '_no_such_user'
+        user = '_no_such_user'
         self.post(self.jobs_url, {
             'commandLine': ['true'],
-            'username': username,
+            'user': user,
             'callbacks': {
                 'error': callback_server.url,
             },

@@ -8,10 +8,10 @@ class TestForkWorkerRunningWithoutRoot(BaseAPITest):
     def test_user_of_job(self):
         callback_server = self.create_callback_server([200])
 
-        username = 'nobody'
+        user = 'nobody'
         self.post(self.jobs_url, {
             'commandLine': ['whoami'],
-            'username': username,
+            'user': user,
             'callbacks': {
                 'error': callback_server.url,
             },
