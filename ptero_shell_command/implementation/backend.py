@@ -14,10 +14,11 @@ class Backend(object):
 'ptero_shell_command.implementation.celery_tasks.shell_command.ShellCommandTask'
         ]
 
-    def create_job(self, command_line, umask, user, cwd=None, environment={},
-        stdin=None, callbacks=None):
-        task = self.shell_command.delay( command_line, umask, user, cwd=cwd,
-            environment=environment, stdin=stdin, callbacks=callbacks)
+    def create_job(self, command_line, umask, user, environment={}, stdin=None,
+        working_directory=None, callbacks=None):
+        task = self.shell_command.delay( command_line, umask, user,
+            environment=environment, stdin=stdin,
+            working_directory=working_directory, callbacks=callbacks)
 
         return task.id
 

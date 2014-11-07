@@ -8,8 +8,8 @@ __all__ = ['ShellCommandTask']
 class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, umask, user, cwd=None, environment=None,
-        stdin=None, callbacks=None):
+    def run(self, command_line, umask, user, environment=None, stdin=None,
+        working_directory=None, callbacks=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
         if user == 'root':
@@ -19,7 +19,7 @@ class ShellCommandTask(celery.Task):
 
         try:
             p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                preexec_fn=lambda :self._setup_execution_environment(cwd, umask, user),
+                preexec_fn=lambda :self._setup_execution_environment(umask, user, working_directory),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -51,7 +51,7 @@ class ShellCommandTask(celery.Task):
 'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
 
-    def _setup_execution_environment(self, cwd, umask, user):
+    def _setup_execution_environment(self, umask, user, working_directory):
         self._set_umask(umask)
         try:
             pw_ent = pwd.getpwnam(user)
@@ -60,7 +60,7 @@ class ShellCommandTask(celery.Task):
 
         uid = pw_ent[2]
         self._set_uid(uid)
-        self._set_cwd(cwd)
+        self._set_working_directory(working_directory)
 
     def _set_umask(self, umask):
         if not umask == None:
@@ -75,9 +75,10 @@ class ShellCommandTask(celery.Task):
         except OSError as e:
             raise PreExecFailed('Failed to setreuid: ' + e.strerror)
 
-    def _set_cwd(self, cwd):
-        if not cwd == None:
+    def _set_working_directory(self, working_directory):
+        if not working_directory == None:
             try:
-                os.chdir(cwd)
+                os.chdir(working_directory)
             except OSError as e:
-                raise PreExecFailed('chdir(%s): %s' % (cwd, e.strerror))
+                raise PreExecFailed(
+                    'chdir(%s): %s' % (working_directory, e.strerror))
