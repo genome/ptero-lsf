@@ -53,13 +53,7 @@ class ShellCommandTask(celery.Task):
 
     def _setup_execution_environment(self, umask, user, working_directory):
         self._set_umask(umask)
-        try:
-            pw_ent = pwd.getpwnam(user)
-        except KeyError as e:
-            raise PreExecFailed(e.message)
-
-        uid = pw_ent[2]
-        self._set_uid(uid)
+        self._set_uid(user)
         self._set_working_directory(working_directory)
 
     def _set_umask(self, umask):
@@ -69,9 +63,14 @@ class ShellCommandTask(celery.Task):
             except TypeError as e:
                 raise PreExecFailed('Failed to set umask: ' + e.message)
 
-    def _set_uid(self, uid):
+    def _set_uid(self, user):
         try:
-            os.setreuid(uid, uid)
+            pw_ent = pwd.getpwnam(user)
+        except KeyError as e:
+            raise PreExecFailed(e.message)
+
+        try:
+            os.setreuid(pw_ent.pw_uid, pw_ent.pw_uid)
         except OSError as e:
             raise PreExecFailed('Failed to setreuid: ' + e.strerror)
 
