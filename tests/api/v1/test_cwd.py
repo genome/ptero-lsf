@@ -35,3 +35,26 @@ class TestCwd(BaseAPITest):
         webhook_data = callback_server.stop()
         actual_cwd = webhook_data[0]['stdout'].strip('\n')
         self.assertEqual(self.job_cwd, actual_cwd)
+
+    def test_job_cwd_does_not_exist(self):
+        callback_server = self.create_callback_server([200])
+
+        post_data = {
+            'commandLine': ['/bin/pwd'],
+            'username': self.job_username,
+            'cwd': '/does/not/exist',
+            'callbacks': {
+                'error': callback_server.url,
+            },
+        }
+
+        post_response = self.post(self.jobs_url, post_data)
+        webhook_data = callback_server.stop()
+        expected_data = [
+            {
+                'status': 'error',
+                'jobId': post_response.DATA['jobId'],
+                'errorMessage': 'chdir(/does/not/exist): No such file or directory'
+            },
+        ]
+        self.assertEqual(webhook_data, expected_data)
