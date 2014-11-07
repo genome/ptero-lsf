@@ -58,3 +58,27 @@ class TestCwd(BaseAPITest):
             },
         ]
         self.assertEqual(webhook_data, expected_data)
+
+    def test_job_cwd_access_denied(self):
+        callback_server = self.create_callback_server([200])
+
+        os.chmod(self.job_cwd, 0)
+        post_data = {
+            'commandLine': ['/bin/pwd'],
+            'username': self.job_username,
+            'cwd': self.job_cwd,
+            'callbacks': {
+                'error': callback_server.url,
+            },
+        }
+
+        post_response = self.post(self.jobs_url, post_data)
+        webhook_data = callback_server.stop()
+        expected_data = [
+            {
+                'status': 'error',
+                'jobId': post_response.DATA['jobId'],
+                'errorMessage': 'chdir(%s): Permission denied' % self.job_cwd
+            },
+        ]
+        self.assertEqual(webhook_data, expected_data)
