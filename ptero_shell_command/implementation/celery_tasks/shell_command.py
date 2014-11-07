@@ -8,7 +8,7 @@ __all__ = ['ShellCommandTask']
 class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, environment=None, stdin=None, callbacks=None, umask=None, username=None):
+    def run(self, command_line, environment=None, stdin=None, callbacks=None, umask=None, cwd=None, username=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
         if username == 'root':
@@ -18,7 +18,7 @@ class ShellCommandTask(celery.Task):
 
         try:
             p = subprocess.Popen(command_line, env=environment, close_fds=True,
-                preexec_fn=lambda :self._setup_execution_environment(username, umask),
+                preexec_fn=lambda :self._setup_execution_environment(username, umask, cwd),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -50,7 +50,7 @@ class ShellCommandTask(celery.Task):
 'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
 
-    def _setup_execution_environment(self, username, umask):
+    def _setup_execution_environment(self, username, umask, cwd):
         self._set_umask(umask)
         try:
             pw_ent = pwd.getpwnam(username)
@@ -59,6 +59,7 @@ class ShellCommandTask(celery.Task):
 
         uid = pw_ent[2]
         self._set_uid(uid)
+        self._set_cwd(cwd)
 
     def _set_umask(self, umask):
         if not umask == None:
@@ -72,3 +73,9 @@ class ShellCommandTask(celery.Task):
             os.setreuid(uid, uid)
         except OSError as e:
             raise PreExecFailed('Failed to setreuid: ' + e.strerror)
+
+    def _set_cwd(self, cwd):
+        try:
+            os.chdir(cwd)
+        except OSError as e:
+            raise PreExecFailed('chdir(%s): %s' % (cwd, e.strerror))
