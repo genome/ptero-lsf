@@ -52,8 +52,8 @@ class ShellCommandTask(celery.Task):
         ]
 
     def _setup_execution_environment(self, umask, user, working_directory):
-        self._set_umask(umask)
         self._set_uid(user)
+        self._set_umask(umask)
         self._set_working_directory(working_directory)
 
     def _set_umask(self, umask):
