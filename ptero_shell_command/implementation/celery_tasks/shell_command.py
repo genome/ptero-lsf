@@ -37,6 +37,13 @@ class ShellCommandTask(celery.Task):
         except PreExecFailed as e:
             self.callback('error', callbacks, jobId=self.request.id, errorMessage=e.message)
             return False
+        except OSError as e:
+            if e.errno == 2:
+                self.callback('error', callbacks, jobId=self.request.id,
+                    errorMessage='Command not found: %s' % command_line[0])
+            else:
+                raise e
+            return False
 
     def callback(self, status, callbacks, **kwargs):
         if callbacks is None:

@@ -145,6 +145,28 @@ class TestWebhooks(BaseAPITest):
         webhook_data = callback_server.stop()
         self.assertEqual(stdin, webhook_data[0]['stdout'])
 
+    def test_command_not_found(self):
+        callback_server = self.create_callback_server([200])
+
+        post_response = self.post(self.jobs_url, {
+            'commandLine': ['bad-command'],
+            'user': self.job_user,
+            'workingDirectory': self.job_working_directory,
+            'callbacks': {
+                'error': callback_server.url,
+            },
+        })
+
+        webhook_data = callback_server.stop()
+        expected_data = [
+            {
+                'status': 'error',
+                'errorMessage': 'Command not found: bad-command',
+                'jobId': post_response.DATA['jobId'],
+            },
+        ]
+        self.assertEqual(expected_data, webhook_data)
+
 
 def _extract_environment_dict(stdin):
     result = {}
