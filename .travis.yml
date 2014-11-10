@@ -1,6 +1,10 @@
 language: python
 python: "2.7"
 
+env:
+    global:
+        - TEST_WITH_ROOT_WORKERS=1
+
 install: pip install tox
 
 before_script: sudo update-alternatives --install /bin/sh sh /bin/bash 100
