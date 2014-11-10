@@ -1,8 +1,10 @@
 import abc
 import os
+import platform
 import requests
 import simplejson
 import subprocess
+import tempfile
 import time
 import unittest
 
@@ -56,6 +58,14 @@ class BaseAPITest(unittest.TestCase):
     def setUp(self):
         self.api_host = os.environ['PTERO_SHELL_COMMAND_HOST']
         self.api_port = os.environ['PTERO_SHELL_COMMAND_PORT']
+
+        if platform.system() == 'Darwin':
+            self.job_working_directory = tempfile.mkdtemp(dir='/private/tmp')
+        else:
+            self.job_working_directory = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.rmdir( self.job_working_directory )
 
     def create_callback_server(self, response_codes):
         server = CallbackServer(response_codes)

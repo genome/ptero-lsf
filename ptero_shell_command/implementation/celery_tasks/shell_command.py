@@ -8,8 +8,8 @@ __all__ = ['ShellCommandTask']
 class PreExecFailed(Exception): pass
 
 class ShellCommandTask(celery.Task):
-    def run(self, command_line, umask, user, environment=None, stdin=None,
-        working_directory=None, callbacks=None):
+    def run(self, command_line, umask, user, working_directory,
+        environment=None, stdin=None, callbacks=None):
         self.callback('begun', callbacks, jobId=self.request.id)
 
         if user == 'root':
@@ -75,9 +75,8 @@ class ShellCommandTask(celery.Task):
             raise PreExecFailed('Failed to setreuid: ' + e.strerror)
 
     def _set_working_directory(self, working_directory):
-        if not working_directory == None:
-            try:
-                os.chdir(working_directory)
-            except OSError as e:
-                raise PreExecFailed(
-                    'chdir(%s): %s' % (working_directory, e.strerror))
+        try:
+            os.chdir(working_directory)
+        except OSError as e:
+            raise PreExecFailed(
+                'chdir(%s): %s' % (working_directory, e.strerror))

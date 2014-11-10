@@ -1,23 +1,9 @@
 from .base import BaseAPITest
 import os
-import platform
 import simplejson
-import tempfile
 
 
 class TestCwd(BaseAPITest):
-    def setUp(self):
-        super(TestCwd, self).setUp()
-
-        if platform.system() == 'Darwin':
-            self.job_working_directory = tempfile.mkdtemp(dir='/private/tmp')
-        else:
-            self.job_working_directory = tempfile.mkdtemp()
-
-    def tearDown(self):
-        super(TestCwd, self).tearDown()
-        os.rmdir( self.job_working_directory )
-
     def test_job_working_directory(self):
         callback_server = self.create_callback_server([200])
 

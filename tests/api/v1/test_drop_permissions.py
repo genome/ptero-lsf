@@ -11,6 +11,7 @@ class TestDropPermissions(BaseAPITest):
         post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
             'user': user,
+            'workingDirectory': self.job_working_directory,
             'callbacks': {
                 'error': callback_server.url,
             },
@@ -33,9 +34,11 @@ class TestDropPermissions(BaseAPITest):
 
         user = 'nobody'
         primarygroup = 'nobody'
+        os.chmod(self.job_working_directory, 0777)
         self.post(self.jobs_url, {
             'commandLine': ['id'],
             'user': user,
+            'workingDirectory': self.job_working_directory,
             'callbacks': {
                 'ended': callback_server.url,
             },
@@ -59,6 +62,7 @@ class TestDropPermissions(BaseAPITest):
         post_response = self.post(self.jobs_url, {
             'commandLine': ['whoami'],
             'user': user,
+            'workingDirectory': self.job_working_directory,
             'callbacks': {
                 'error': callback_server.url,
             },
@@ -81,6 +85,7 @@ class TestDropPermissions(BaseAPITest):
         post_response = self.post(self.jobs_url, {
             'commandLine': ['true'],
             'user': user,
+            'workingDirectory': self.job_working_directory,
             'callbacks': {
                 'error': callback_server.url,
             },
