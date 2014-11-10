@@ -13,7 +13,7 @@ def _test_umask_set_for_job(self, umask):
     callback_server = self.create_callback_server([200])
 
     post_data = {
-        'commandLine': ['/usr/bin/umask'],
+        'commandLine': ['/bin/bash', '-c', 'umask'],
         'user': self.job_user,
         'workingDirectory': self.job_working_directory,
         'umask': umask,
