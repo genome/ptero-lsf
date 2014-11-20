@@ -14,10 +14,11 @@ class Backend(object):
 'ptero_shell_command.implementation.celery_tasks.shell_command.ShellCommandTask'
         ]
 
-    def create_job(self, command_line, environment={}, stdin=None,
-            callbacks=None):
-        task = self.shell_command.delay(command_line, environment=environment,
-                stdin=stdin, callbacks=callbacks)
+    def create_job(self, command_line, umask, user, working_directory,
+        environment={}, stdin=None, callbacks=None):
+        task = self.shell_command.delay( command_line, umask, user,
+            working_directory, environment=environment, stdin=stdin,
+            callbacks=callbacks)
 
         return task.id
 
@@ -32,8 +33,7 @@ def _job_status_from_task(task):
 
     state = task.state
     if state == 'SUCCESS':
-        result = task.result
-        if result.get('exit_code') == 0:
+        if task.result:
             return 'succeeded'
         else:
             return 'failed'

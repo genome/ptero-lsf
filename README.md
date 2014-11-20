@@ -17,7 +17,7 @@ To run tests:
     tox
 
 
-## Deveopment
+## Development
 
 To launch a development server:
 
