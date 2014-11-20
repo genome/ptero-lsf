@@ -25,4 +25,4 @@ To launch a development server:
     pip install honcho
     honcho start -f Procfile.dev -c worker=4
 
-You can then connect to the webserver at http://localhost:5200
+You can then connect to the webserver at http://localhost:7200
