@@ -1,6 +1,7 @@
 import abc
 import os
 import platform
+import pwd
 import requests
 import simplejson
 import subprocess
@@ -78,7 +79,7 @@ class BaseAPITest(unittest.TestCase):
 
     @property
     def job_user(self):
-        return os.getlogin()
+        return pwd.getpwuid(os.getuid())[0]
 
     def get(self, url, **kwargs):
         return _deserialize_response(requests.get(url, params=kwargs))
