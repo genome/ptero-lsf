@@ -9,21 +9,20 @@ class Backend(object):
         pass
 
     @property
-    def shell_command(self):
+    def lsf(self):
         return self.celery_app.tasks[
-'ptero_shell_command.implementation.celery_tasks.shell_command.ShellCommandTask'
+'ptero_lsf.implementation.celery_tasks.lsf.LSFTask'
         ]
 
     def create_job(self, command_line, umask, user, working_directory,
         environment={}, stdin=None, callbacks=None):
-        task = self.shell_command.delay( command_line, umask, user,
-            working_directory, environment=environment, stdin=stdin,
-            callbacks=callbacks)
+        task = self.lsf.delay(command_line, umask, user, working_directory,
+                environment=environment, stdin=stdin, callbacks=callbacks)
 
         return task.id
 
     def get_job_status(self, job_id):
-        task = self.shell_command.AsyncResult(job_id)
+        task = self.lsf.AsyncResult(job_id)
 
         return _job_status_from_task(task)
 

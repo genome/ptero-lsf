@@ -1,7 +1,7 @@
 from . import parsers
 from flask import g, request, url_for
 from flask.ext.restful import Resource, marshal
-from ptero_shell_command import exceptions
+from ptero_lsf import exceptions
 
 
 class JobListView(Resource):
