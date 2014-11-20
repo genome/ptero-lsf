@@ -1,7 +1,7 @@
 [run]
 branch = True
 parallel = True
-source = ptero_shell_command
+source = ptero_lsf
 
 [report]
 show_missing = True

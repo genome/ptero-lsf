@@ -2,15 +2,15 @@ import celery
 import os
 
 
-TASK_PATH = 'ptero_shell_command.implementation.celery_tasks'
+TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
 
 
-app = celery.Celery('PTero-shell-command-celery', include=TASK_PATH)
+app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
 
 app.conf['CELERY_ROUTES'] = (
     {
-        TASK_PATH + '.shell_command.ShellCommandTask': {'queue': 'fork'},
+        TASK_PATH + '.lsf.LSFTask': {'queue': 'fork'},
         TASK_PATH + '.http_callback.HTTPCallbackTask': {'queue': 'http'},
     },
 )

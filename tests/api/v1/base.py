@@ -1,6 +1,7 @@
 import abc
 import os
 import platform
+import pwd
 import requests
 import simplejson
 import subprocess
@@ -56,8 +57,8 @@ class BaseAPITest(unittest.TestCase):
     __metaclass__ = abc.ABCMeta
 
     def setUp(self):
-        self.api_host = os.environ['PTERO_SHELL_COMMAND_HOST']
-        self.api_port = os.environ['PTERO_SHELL_COMMAND_PORT']
+        self.api_host = os.environ['PTERO_LSF_HOST']
+        self.api_port = os.environ['PTERO_LSF_PORT']
 
         if platform.system() == 'Darwin':
             self.job_working_directory = tempfile.mkdtemp(dir='/private/tmp')
@@ -78,7 +79,7 @@ class BaseAPITest(unittest.TestCase):
 
     @property
     def job_user(self):
-        return os.getlogin()
+        return pwd.getpwuid(os.getuid())[0]
 
     def get(self, url, **kwargs):
         return _deserialize_response(requests.get(url, params=kwargs))

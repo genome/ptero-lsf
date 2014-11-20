@@ -3,11 +3,11 @@ import os
 import pwd
 import subprocess
 
-__all__ = ['ShellCommandTask']
+__all__ = ['LSFTask']
 
 class PreExecFailed(Exception): pass
 
-class ShellCommandTask(celery.Task):
+class LSFTask(celery.Task):
     def run(self, command_line, umask, user, working_directory,
         environment=None, stdin=None, callbacks=None):
         self.callback('begun', callbacks, jobId=self.request.id)
@@ -55,7 +55,7 @@ class ShellCommandTask(celery.Task):
 
     def _get_http_task(self):
         return celery.current_app.tasks[
-'ptero_shell_command.implementation.celery_tasks.http_callback.HTTPCallbackTask'
+'ptero_lsf.implementation.celery_tasks.http_callback.HTTPCallbackTask'
         ]
 
     def _setup_execution_environment(self, umask, user, working_directory):
