@@ -14,7 +14,7 @@ class Backend(object):
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask'
         ]
 
-    def create_job(self, command):
-        task = self.lsf.delay(command)
+    def create_job(self, command, options):
+        task = self.lsf.delay(command, options)
 
         return task.id

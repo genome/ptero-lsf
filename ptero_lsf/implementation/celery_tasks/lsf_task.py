@@ -8,6 +8,6 @@ __all__ = ['LSFTask']
 
 
 class LSFTask(celery.Task):
-    def run(self, command):
-        job = lsf.submit(str(command))
+    def run(self, command, options):
+        job = lsf.submit(str(command), options=options)
         return job.job_id
