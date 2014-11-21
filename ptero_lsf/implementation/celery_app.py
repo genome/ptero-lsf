@@ -8,14 +8,6 @@ TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
 app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
 
-app.conf['CELERY_ROUTES'] = (
-    {
-        TASK_PATH + '.lsf_task.LSFTask': {'queue': 'fork'},
-        TASK_PATH + '.http_callback.HTTPCallbackTask': {'queue': 'http'},
-    },
-)
-
-
 _DEFAULT_CELERY_CONFIG = {
     'CELERY_BROKER_URL': 'amqp://localhost',
     'CELERY_RESULT_BACKEND': 'redis://localhost',
