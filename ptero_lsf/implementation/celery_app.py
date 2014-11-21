@@ -10,7 +10,7 @@ app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
 app.conf['CELERY_ROUTES'] = (
     {
-        TASK_PATH + '.lsf.LSFTask': {'queue': 'fork'},
+        TASK_PATH + '.lsf_task.LSFTask': {'queue': 'fork'},
         TASK_PATH + '.http_callback.HTTPCallbackTask': {'queue': 'http'},
     },
 )
