@@ -1,7 +1,6 @@
 from . import parsers
-from flask import g, request, url_for
-from flask.ext.restful import Resource, marshal
-from ptero_lsf import exceptions
+from flask import g, request
+from flask.ext.restful import Resource
 
 
 class JobListView(Resource):
