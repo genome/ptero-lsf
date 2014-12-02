@@ -1,20 +1,10 @@
 from . import parsers
-from flask import g, request, url_for
-from flask.ext.restful import Resource, marshal
-from ptero_lsf import exceptions
+from flask import g, request
+from flask.ext.restful import Resource
 
 
 class JobListView(Resource):
     def post(self):
         data = parsers.get_job_post_data()
         job_id = g.backend.create_job(**data)
-        return {'jobId': job_id}, 201, {'Location': url_for('job', pk=job_id)}
-
-
-class JobView(Resource):
-    def get(self, pk):
-        status = g.backend.get_job_status(pk)
-        if status is not None:
-            return {'status': status}
-        else:
-            return {'message': 'Job not found.'}, 404
+        return {'jobId': job_id}, 201

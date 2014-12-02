@@ -59,6 +59,7 @@ class BaseAPITest(unittest.TestCase):
     def setUp(self):
         self.api_host = os.environ['PTERO_LSF_HOST']
         self.api_port = os.environ['PTERO_LSF_PORT']
+        self.tempdir = os.environ['PTERO_LSF_TEST_NETWORK_TEMP']
 
         if platform.system() == 'Darwin':
             self.job_working_directory = tempfile.mkdtemp(dir='/private/tmp')
@@ -76,6 +77,12 @@ class BaseAPITest(unittest.TestCase):
     @property
     def jobs_url(self):
         return 'http://%s:%s/v1/jobs' % (self.api_host, self.api_port)
+
+    def make_tempfile(self):
+        file_object = tempfile.NamedTemporaryFile(dir=self.tempdir)
+        name = file_object.name
+        file_object.close()
+        return name
 
     @property
     def job_user(self):

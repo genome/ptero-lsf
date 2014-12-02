@@ -3,6 +3,7 @@ flask
 flask-restful
 gunicorn
 librabbitmq
+lsf
 python-dateutil
 python-statsd
 redis

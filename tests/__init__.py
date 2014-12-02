@@ -47,7 +47,11 @@ def setUp():
     global instance
 
     logdir = 'var/log'
+
     mkdir_p(logdir)
+    if 'PTERO_LSF_TEST_NETWORK_TEMP' in os.environ:
+        mkdir_p(os.environ['PTERO_LSF_TEST_NETWORK_TEMP'])
+
     outlog = open(os.path.join(logdir, 'honcho.out'), 'w')
     errlog = open(os.path.join(logdir, 'honcho.err'), 'w')
 
