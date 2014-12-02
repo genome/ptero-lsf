@@ -61,10 +61,7 @@ class BaseAPITest(unittest.TestCase):
         self.api_port = os.environ['PTERO_LSF_PORT']
         self.tempdir = os.environ['PTERO_LSF_TEST_NETWORK_TEMP']
 
-        if platform.system() == 'Darwin':
-            self.job_working_directory = tempfile.mkdtemp(dir='/private/tmp')
-        else:
-            self.job_working_directory = tempfile.mkdtemp()
+        self.job_working_directory = tempfile.mkdtemp(dir=self.tempdir)
 
     def tearDown(self):
         os.rmdir( self.job_working_directory )
