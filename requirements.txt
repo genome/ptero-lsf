@@ -1,7 +1,8 @@
 celery
 flask
-flask-restful
+flask-restful == 0.2.12
 gunicorn
+jsonschema == 2.4.0
 librabbitmq
 lsf
 python-dateutil

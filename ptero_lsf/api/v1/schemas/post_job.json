@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "POST /v1/jobs",
+    "description": "Submit a new job.",
+
+    "definitions": {
+        "command": {
+            "type": "string",
+            "minLength": 1
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "command": { "$ref": "#/definitions/command" },
+
+        "options": {
+            "type": "object",
+            "properties": {
+                "beginTime": { "type": "integer" },
+                "errFile": { "type": "string" },
+                "group": { "type": "string" },
+                "inFile": { "type": "string" },
+                "jobName": { "type": "string" },
+                "mail_user": { "type": "string" },
+                "maxNumProcessors": { "type": "integer" },
+                "numProcessors": { "type": "integer" },
+                "outFile": { "type": "string" },
+                "preExecCmd": { "$ref": "#/definitions/command" },
+                "postExecCmd": { "$ref": "#/definitions/command" },
+                "projectName": { "type": "string" },
+                "queue": { "type": "string" },
+                "resReq": { "type": "string" },
+                "termTime": { "type": "integer" }
+            },
+            "additionalProperties": false
+        }
+    },
+
+    "required": ["command"],
+    "additionalProperties": false
+}
