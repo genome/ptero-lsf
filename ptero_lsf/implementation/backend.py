@@ -2,11 +2,12 @@ from . import celery_tasks
 
 
 class Backend(object):
-    def __init__(self, celery_app):
+    def __init__(self, session, celery_app):
+        self.session = session
         self.celery_app = celery_app
 
     def cleanup(self):
-        pass
+        self.session.rollback()
 
     @property
     def lsf(self):
