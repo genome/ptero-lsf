@@ -1,11 +1,8 @@
-celery
-flask
-flask-restful
-gunicorn
-librabbitmq
-lsf
-python-dateutil
-python-statsd
-redis
-requests
-simplejson
+celery == 3.1.17
+flask == 0.10.1
+flask-restful == 0.2.12
+gunicorn == 19.1.1
+librabbitmq == 1.6.1
+lsf == v0.1.0
+redis == 2.10.3
+requests == 2.5.0

@@ -1,6 +1,6 @@
 import celery
+import json
 import requests
-import simplejson
 
 __all__ = ['HTTPCallbackTask']
 
@@ -12,4 +12,4 @@ class HTTPCallbackTask(celery.Task):
                 headers={'Content-Type': 'application/json'})
 
     def body(self, kwargs):
-        return simplejson.dumps(kwargs)
+        return json.dumps(kwargs)
