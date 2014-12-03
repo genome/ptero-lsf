@@ -7,17 +7,23 @@ class SubmitTest(BaseAPITest):
     def test_submit_small_job(self):
         test_data = 'hello small job'
         outfile = self.make_tempfile()
-        self.post(self.jobs_url, {
+        submit_data = {
             'command': 'echo "%s"' % test_data,
             'options': {
                 'outFile': outfile,
             },
-        })
+        }
+        response = self.post(self.jobs_url, submit_data)
 
         self.assertTrue(_wait_for_file(outfile))
 
         data = open(outfile).read()
         self.assertRegexpMatches(data, '%s.*' % test_data)
+
+        status_response = self.get(response.headers['Location'])
+        self.assertEqual(status_response.status_code, 200)
+        for key, value in submit_data.iteritems():
+            self.assertEqual(status_response.DATA[key], value)
 
 
 _MAX_TRIES = 10
