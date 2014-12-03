@@ -25,6 +25,8 @@ class SubmitTest(BaseAPITest):
         for key, value in submit_data.iteritems():
             self.assertEqual(status_response.DATA[key], value)
 
+        self.assertIsInstance(status_response.DATA['lsfJobId'], int)
+
 
 _MAX_TRIES = 10
 _POLLING_INTERVAL = 10
