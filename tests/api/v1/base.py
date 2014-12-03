@@ -1,9 +1,9 @@
 import abc
+import json
 import os
 import platform
 import pwd
 import requests
-import simplejson
 import subprocess
 import tempfile
 import time
@@ -34,7 +34,7 @@ class CallbackServer:
             stdout, stderr = self._webserver.communicate()
             self._webserver = None
             if stdout:
-                return map(simplejson.loads, stdout.split('\n')[:-1])
+                return map(json.loads, stdout.split('\n')[:-1])
         return []
 
     def _wait(self):
@@ -91,17 +91,17 @@ class BaseAPITest(unittest.TestCase):
     def patch(self, url, data):
         return _deserialize_response(requests.patch(url,
             headers={'content-type': 'application/json'},
-            data=simplejson.dumps(data)))
+            data=json.dumps(data)))
 
     def post(self, url, data):
         return _deserialize_response(requests.post(url,
             headers={'content-type': 'application/json'},
-            data=simplejson.dumps(data)))
+            data=json.dumps(data)))
 
     def put(self, url, data):
         return _deserialize_response(requests.put(url,
             headers={'content-type': 'application/json'},
-            data=simplejson.dumps(data)))
+            data=json.dumps(data)))
 
 
 def _deserialize_response(response):

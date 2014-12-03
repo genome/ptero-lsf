@@ -1,8 +1,5 @@
 # PTero LSF Service
-<!--
-[![Build Status](https://travis-ci.org/genome/ptero-lsf.png?branch=master)](https://travis-ci.org/genome/ptero-lsf)
-[![Coverage Status](https://coveralls.io/repos/genome/ptero-lsf/badge.png)](https://coveralls.io/r/genome/ptero-lsf)
--->
+[![Requirements Status](https://requires.io/github/genome/ptero-lsf/requirements.svg?branch=master)](https://requires.io/github/genome/ptero-lsf/requirements/?branch=master)
 
 This project provides a way for the PTero workflow system to run commands via
 LSF using [Celery](http://www.celeryproject.org/) via a REST API.
