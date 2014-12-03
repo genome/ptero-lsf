@@ -7,7 +7,7 @@ import sys
 import time
 
 
-NUM_WORKERS = 4
+NUM_WORKERS = 1
 
 
 instance = None
