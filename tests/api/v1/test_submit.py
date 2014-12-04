@@ -14,6 +14,8 @@ class SubmitTest(BaseAPITest):
                 'outFile': outfile,
             },
         }
+        self.set_queue(submit_data)
+
         response = self.post(self.jobs_url, submit_data)
 
         pprint.pprint(response.DATA)

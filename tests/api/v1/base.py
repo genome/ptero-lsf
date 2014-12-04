@@ -103,6 +103,9 @@ class BaseAPITest(unittest.TestCase):
             headers={'content-type': 'application/json'},
             data=json.dumps(data)))
 
+    def set_queue(self, submit_data):
+        if 'PTERO_LSF_TEST_QUEUE' in os.environ:
+            submit_data['options']['queue'] = os.environ['PTERO_LSF_TEST_QUEUE']
 
 def _deserialize_response(response):
     response.DATA = response.json()
