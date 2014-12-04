@@ -1,5 +1,6 @@
 from .base import BaseAPITest
 import os
+import pprint
 import time
 
 
@@ -14,6 +15,9 @@ class SubmitTest(BaseAPITest):
             },
         }
         response = self.post(self.jobs_url, submit_data)
+
+        pprint.pprint(response.DATA)
+        self.assertEqual(response.status_code, 201)
 
         self.assertTrue(_wait_for_file(outfile))
 
