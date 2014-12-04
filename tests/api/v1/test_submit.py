@@ -34,7 +34,7 @@ class SubmitTest(BaseAPITest):
         self.assertIsInstance(status_response.DATA['lsfJobId'], int)
 
 
-_MAX_TRIES = 10
+_MAX_TRIES = 30
 _POLLING_INTERVAL = 10
 def _wait_for_file(filename):
     for i in xrange(_MAX_TRIES):
