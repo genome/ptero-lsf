@@ -17,8 +17,9 @@ class Backend(object):
         ]
 
     def create_job(self, command, options):
-        job = models.Job(command=command, options=options, status='NEW')
+        job = models.Job(command=command, options=options)
         self.session.add(job)
+        job.set_status('NEW')
         self.session.commit()
 
         task = self.lsf.delay(job.id, command, options)

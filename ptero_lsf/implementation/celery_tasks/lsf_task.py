@@ -16,4 +16,5 @@ class LSFTask(celery.Task):
         lsf_job = lsf.submit(str(command), options=options)
 
         service_job.lsf_job_id = lsf_job.job_id
+        service_job.set_status('SUBMITTED')
         session.commit()
