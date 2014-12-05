@@ -1,11 +1,16 @@
 from .base import Base
+import datetime
 from json_type import JSON
 from sqlalchemy import Column, func
-from sqlalchemy import DateTime, ForeignKey, Integer, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import object_session
 
 
 __all__ = ['Job']
+
+
+_TERMINAL_STATUSES = {'SUCCESS', 'FAILURE', 'ERROR'}
 
 
 class Job(Base):
@@ -21,6 +26,9 @@ class Job(Base):
                         nullable=False)
 
     lsf_job_id = Column(Integer, index=True)
+
+    poll_after = Column(DateTime, nullable=True, index=True)
+    polling_interval = Column(Interval, nullable=False)
 
     @property
     def latest_status(self):
@@ -39,6 +47,15 @@ class Job(Base):
         JobStatusHistory(job=self, status=current_status,
                          lsf_status_set=lsf_sorted_statuses,
                          lsf_primary_status=lsf_primary_status)
+
+    def update_poll_after(self):
+        if self.latest_status.status in _TERMINAL_STATUSES:
+            self.poll_after = None
+        else:
+            s = object_session(self)
+            s.query(Job).filter_by(id=self.id).update({
+                'poll_after': self.polling_interval + datetime.datetime.now(),
+            })
 
     @property
     def as_dict(self):
