@@ -18,8 +18,16 @@ class SubmitTest(BaseAPITest):
 
         response = self.post(self.jobs_url, submit_data)
 
+        pprint.pprint(response.headers)
         pprint.pprint(response.DATA)
         self.assertEqual(response.status_code, 201)
+
+        time.sleep(5)
+
+        status_response = self.get(response.headers['Location'])
+        self.assertEqual(status_response.status_code, 200)
+
+        pprint.pprint(status_response.DATA)
 
         self.assertTrue(_wait_for_file(outfile))
 
