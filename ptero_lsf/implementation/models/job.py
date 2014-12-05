@@ -87,9 +87,15 @@ class JobStatusHistory(Base):
 
     @property
     def as_dict(self):
-        return {
+        result = {
             'timestamp': self.timestamp,
             'status': self.status,
-            'lsfPrimaryStatus': self.lsf_primary_status,
-            'lsfStatusSet': self.lsf_status_set,
         }
+
+        if self.lsf_primary_status is not None:
+            result['lsfPrimaryStatus'] = self.lsf_primary_status
+
+        if self.lsf_status_set is not None:
+            result['lsfStatusSet'] = self.lsf_status_set
+
+        return result
