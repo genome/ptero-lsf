@@ -57,7 +57,7 @@ class Job(Base):
 
     def _conditional_add(self, result, prop, name):
         value = getattr(self, prop)
-        if value:
+        if value is not None:
             result[name] = value
 
 
