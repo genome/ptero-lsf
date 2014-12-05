@@ -4,6 +4,7 @@ import os
 import platform
 import pwd
 import requests
+import shutil
 import subprocess
 import tempfile
 import time
@@ -64,7 +65,7 @@ class BaseAPITest(unittest.TestCase):
         self.job_working_directory = tempfile.mkdtemp(dir=self.tempdir)
 
     def tearDown(self):
-        os.rmdir( self.job_working_directory )
+        shutil.rmtree(self.job_working_directory)
 
     def create_callback_server(self, response_codes):
         server = CallbackServer(response_codes)
