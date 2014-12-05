@@ -24,6 +24,7 @@ class SubmitTest(BaseAPITest):
         self.assertTrue(_wait_for_file(outfile))
 
         data = open(outfile).read()
+        os.remove(outfile)
         self.assertRegexpMatches(data, '%s.*' % test_data)
 
         status_response = self.get(response.headers['Location'])
