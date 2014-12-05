@@ -76,7 +76,8 @@ class BaseAPITest(unittest.TestCase):
         return 'http://%s:%s/v1/jobs' % (self.api_host, self.api_port)
 
     def make_tempfile(self):
-        file_object = tempfile.NamedTemporaryFile(dir=self.tempdir)
+        file_object = tempfile.NamedTemporaryFile(
+            dir=self.job_working_directory)
         name = file_object.name
         file_object.close()
         return name
