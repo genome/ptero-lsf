@@ -77,10 +77,10 @@ class JobStatusHistory(Base):
     timestamp = Column(DateTime(timezone=True), default=func.now(),
                        nullable=False)
 
-    status = Column(Text, nullable=False)
+    status = Column(Text, index=True, nullable=False)
 
-    lsf_primary_status = Column(Text, nullable=False)
-    lsf_status_set = Column(JSON, nullable=False)
+    lsf_primary_status = Column(Text, index=True)
+    lsf_status_set = Column(JSON)
 
     job = relationship(Job,
                        backref=backref('status_history', order_by=timestamp))
