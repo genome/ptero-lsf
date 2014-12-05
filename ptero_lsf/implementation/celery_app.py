@@ -1,5 +1,7 @@
+from celery.signals import worker_init
 import celery
 import os
+import sqlalchemy
 
 
 TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
@@ -23,3 +25,15 @@ for var, default in _DEFAULT_CELERY_CONFIG.iteritems():
         app.conf[var] = os.environ[var]
     else:
         app.conf[var] = default
+
+
+app.Session = sqlalchemy.orm.sessionmaker()
+
+
+@worker_init.connect
+def initialize_sqlalchemy_session(signal, sender):
+    from . import models
+
+    engine = sqlalchemy.create_engine(os.environ['PTERO_LSF_DB_STRING'])
+    models.Base.metadata.create_all(engine)
+    app.Session.configure(bind=engine)

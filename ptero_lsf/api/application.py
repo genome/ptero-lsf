@@ -1,13 +1,15 @@
 from . import v1
 from ..implementation import Factory
 import flask
+import os
 
 
 __all__ = ['create_app']
 
 
-def create_app(celery_configuration=None):
-    factory = Factory(celery_configuration=celery_configuration)
+def create_app():
+    factory = Factory(
+            database_url=os.environ.get('PTERO_LSF_DB_STRING', 'sqlite://'))
 
     app = _create_app_from_blueprints()
 

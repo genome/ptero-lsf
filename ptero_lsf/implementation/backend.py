@@ -1,12 +1,14 @@
 from . import celery_tasks
+from . import models
 
 
 class Backend(object):
-    def __init__(self, celery_app):
+    def __init__(self, session, celery_app):
+        self.session = session
         self.celery_app = celery_app
 
     def cleanup(self):
-        pass
+        self.session.rollback()
 
     @property
     def lsf(self):
@@ -15,6 +17,15 @@ class Backend(object):
         ]
 
     def create_job(self, command, options):
-        task = self.lsf.delay(command, options)
+        job = models.Job(command=command, options=options, status='NEW')
+        self.session.add(job)
+        self.session.commit()
 
-        return task.id
+        task = self.lsf.delay(job.id, command, options)
+
+        return job.id, job.as_dict
+
+    def get_job(self, job_id):
+        job = self.session.query(models.Job).get(job_id)
+        if job:
+            return job.as_dict

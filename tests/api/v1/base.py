@@ -4,6 +4,7 @@ import os
 import platform
 import pwd
 import requests
+import shutil
 import subprocess
 import tempfile
 import time
@@ -64,7 +65,7 @@ class BaseAPITest(unittest.TestCase):
         self.job_working_directory = tempfile.mkdtemp(dir=self.tempdir)
 
     def tearDown(self):
-        os.rmdir( self.job_working_directory )
+        shutil.rmtree(self.job_working_directory)
 
     def create_callback_server(self, response_codes):
         server = CallbackServer(response_codes)
@@ -76,7 +77,8 @@ class BaseAPITest(unittest.TestCase):
         return 'http://%s:%s/v1/jobs' % (self.api_host, self.api_port)
 
     def make_tempfile(self):
-        file_object = tempfile.NamedTemporaryFile(dir=self.tempdir)
+        file_object = tempfile.NamedTemporaryFile(
+            dir=self.job_working_directory)
         name = file_object.name
         file_object.close()
         return name
@@ -103,6 +105,9 @@ class BaseAPITest(unittest.TestCase):
             headers={'content-type': 'application/json'},
             data=json.dumps(data)))
 
+    def set_queue(self, submit_data):
+        if 'PTERO_LSF_TEST_QUEUE' in os.environ:
+            submit_data['options']['queue'] = os.environ['PTERO_LSF_TEST_QUEUE']
 
 def _deserialize_response(response):
     response.DATA = response.json()
