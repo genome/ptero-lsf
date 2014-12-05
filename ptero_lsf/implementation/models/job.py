@@ -88,7 +88,7 @@ class JobStatusHistory(Base):
     @property
     def as_dict(self):
         result = {
-            'timestamp': self.timestamp,
+            'timestamp': self.timestamp.isoformat(),
             'status': self.status,
         }
 
