@@ -13,6 +13,12 @@
     "type": "object",
     "properties": {
         "command": { "$ref": "#/definitions/command" },
+        "pollingInterval": {
+            "type": "integer",
+            "default": 900,
+            "minimum": 0,
+            "exclusiveMinimum": true
+        },
 
         "options": {
             "type": "object",
