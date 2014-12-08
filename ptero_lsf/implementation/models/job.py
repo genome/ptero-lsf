@@ -11,7 +11,19 @@ import datetime
 __all__ = ['Job']
 
 
-_TERMINAL_STATUSES = {'SUCCESS', 'FAILURE', 'ERROR'}
+_TERMINAL_STATUSES = {
+    'ERRORED',
+    'FAILED',
+    'SUCCEEDED',
+}
+_WEBHOOK_TO_TRIGGER = {
+    'ERRORED': 'error',
+    'FAILED': 'failure',
+    'RUNNING': 'running',
+    'SUCCEEDED': 'success',
+    'SCHEDULED': 'scheduled',
+    'SUSPENDED': 'suspended',
+}
 
 
 class Job(Base):
@@ -51,6 +63,8 @@ class Job(Base):
                          lsf_status_set=lsf_sorted_statuses,
                          lsf_primary_status=lsf_primary_status)
 
+        return _WEBHOOK_TO_TRIGGER.get(current_status)
+
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:
             self.poll_after = None
@@ -89,7 +103,22 @@ class Job(Base):
                 ].delay(webhook_url, **self.as_dict)
 
 
+_STATUS_MAP = {
+    'DONE': 'SUCCEEDED',
+    'EXIT': 'FAILED',
+    'PEND': 'SCHEDULED',
+    'PSUSP': 'SUSPENDED',
+    'RUN': 'RUNNING',
+    'SSUSP': 'SUSPENDED',
+    'USUSP': 'SUSPENDED',
+    'WAIT': 'WAITING',
+}
+
 def _extract_status(lsf_status_set):
+    for lsf_status, status in _STATUS_MAP.iteritems():
+        if lsf_status in lsf_status_set:
+            return status
+
     return 'UNKNOWN'
 
 

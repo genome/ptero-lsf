@@ -28,11 +28,13 @@
         "webhooks": {
             "type": "object",
             "properties": {
-                "submit": { "$ref": "#/definitions/webhook" },
-                "running": { "$ref": "#/definitions/webhook" },
-                "success": { "$ref": "#/definitions/webhook" },
+                "error": { "$ref": "#/definitions/webhook" },
                 "failure": { "$ref": "#/definitions/webhook" },
-                "error": { "$ref": "#/definitions/webhook" }
+                "running": { "$ref": "#/definitions/webhook" },
+                "scheduled": { "$ref": "#/definitions/webhook" },
+                "submit": { "$ref": "#/definitions/webhook" },
+                "success": { "$ref": "#/definitions/webhook" },
+                "suspended": { "$ref": "#/definitions/webhook" }
             }
         },
 
