@@ -36,6 +36,9 @@ class SubmitTest(BaseAPITest):
 
         status_response = self.get(response.headers['Location'])
         self.assertEqual(status_response.status_code, 200)
+
+        pprint.pprint(status_response.DATA)
+
         for key, value in submit_data.iteritems():
             self.assertEqual(status_response.DATA[key], value)
 

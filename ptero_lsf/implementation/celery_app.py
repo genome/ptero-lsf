@@ -27,6 +27,13 @@ for var, default in _DEFAULT_CELERY_CONFIG.iteritems():
         app.conf[var] = default
 
 
+app.conf['CELERYBEAT_SCHEDULE'] = {
+    'choose-jobs-to-poll': {
+        'task': TASK_PATH + '.polling.PollActiveJobs',
+        'schedule': 10,
+    },
+}
+
 app.Session = sqlalchemy.orm.sessionmaker()
 
 

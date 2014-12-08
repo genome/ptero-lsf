@@ -1,5 +1,6 @@
 from . import celery_tasks
 from . import models
+import datetime
 
 
 class Backend(object):
@@ -16,9 +17,14 @@ class Backend(object):
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask'
         ]
 
-    def create_job(self, command, options):
-        job = models.Job(command=command, options=options, status='NEW')
+    def create_job(self, command, options=None, webhooks=None,
+                   pollingInterval=900):
+        polling_interval = datetime.timedelta(seconds=pollingInterval)
+
+        job = models.Job(command=command, options=options, webhooks=webhooks,
+                polling_interval=polling_interval)
         self.session.add(job)
+        job.set_status('NEW')
         self.session.commit()
 
         task = self.lsf.delay(job.id, command, options)

@@ -7,12 +7,36 @@
         "command": {
             "type": "string",
             "minLength": 1
+        },
+        "webhook": {
+            "type": "string",
+            "format": "uri",
+            "minLength": 1
         }
     },
 
     "type": "object",
     "properties": {
         "command": { "$ref": "#/definitions/command" },
+        "pollingInterval": {
+            "type": "integer",
+            "default": 900,
+            "minimum": 0,
+            "exclusiveMinimum": true
+        },
+
+        "webhooks": {
+            "type": "object",
+            "properties": {
+                "error": { "$ref": "#/definitions/webhook" },
+                "failure": { "$ref": "#/definitions/webhook" },
+                "running": { "$ref": "#/definitions/webhook" },
+                "scheduled": { "$ref": "#/definitions/webhook" },
+                "submit": { "$ref": "#/definitions/webhook" },
+                "success": { "$ref": "#/definitions/webhook" },
+                "suspended": { "$ref": "#/definitions/webhook" }
+            }
+        },
 
         "options": {
             "type": "object",
