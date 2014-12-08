@@ -58,6 +58,20 @@
                 "termTime": { "type": "integer" }
             },
             "additionalProperties": false
+        },
+
+        "rLimits": {
+            "type": "object",
+            "properties": {
+                "cpuTime": { "type": "integer" },
+                "RSS": { "type": "integer" },
+                "openFiles": { "type": "integer" },
+                "processes": { "type": "integer" },
+                "stack": { "type": "integer" },
+                "threads": { "type": "integer" },
+                "virtualMemory": { "type": "integer" }
+            },
+            "additionalProperties": false
         }
     },
 

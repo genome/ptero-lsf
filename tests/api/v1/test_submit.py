@@ -13,6 +13,9 @@ class SubmitTest(BaseAPITest):
             'options': {
                 'outFile': outfile,
             },
+            'rLimits': {
+                'cpuTime': 1,
+            },
         }
         self.set_queue(submit_data)
 
