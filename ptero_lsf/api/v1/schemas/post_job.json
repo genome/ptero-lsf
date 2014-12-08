@@ -7,6 +7,11 @@
         "command": {
             "type": "string",
             "minLength": 1
+        },
+        "webhook": {
+            "type": "string",
+            "format": "uri",
+            "minLength": 1
         }
     },
 
@@ -18,6 +23,17 @@
             "default": 900,
             "minimum": 0,
             "exclusiveMinimum": true
+        },
+
+        "webhooks": {
+            "type": "object",
+            "properties": {
+                "submit": { "$ref": "#/definitions/webhook" },
+                "running": { "$ref": "#/definitions/webhook" },
+                "success": { "$ref": "#/definitions/webhook" },
+                "failure": { "$ref": "#/definitions/webhook" },
+                "error": { "$ref": "#/definitions/webhook" }
+            }
         },
 
         "options": {

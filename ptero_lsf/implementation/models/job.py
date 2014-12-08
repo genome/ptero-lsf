@@ -1,10 +1,11 @@
 from .base import Base
-import datetime
 from json_type import JSON
 from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.orm import object_session
+import celery
+import datetime
 
 
 __all__ = ['Job']
@@ -29,6 +30,8 @@ class Job(Base):
 
     poll_after = Column(DateTime, nullable=True, index=True)
     polling_interval = Column(Interval, nullable=False)
+
+    webhooks = Column(JSON, default=lambda: {}, nullable=False)
 
     @property
     def latest_status(self):
@@ -63,6 +66,7 @@ class Job(Base):
             'command': self.command,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
+            'webhooks': self.webhooks,
         }
 
         self._conditional_add(result, 'options', 'options')
@@ -75,6 +79,14 @@ class Job(Base):
         value = getattr(self, prop)
         if value is not None:
             result[name] = value
+
+    def trigger_webhook(self, webhook_name):
+        if webhook_name:
+            webhook_url = self.webhooks.get(webhook_name)
+            if webhook_url:
+                celery.current_app.tasks[
+'ptero_lsf.implementation.celery_tasks.http_callback.HTTPCallbackTask'
+                ].delay(webhook_url, **self.as_dict)
 
 
 def _extract_status(lsf_status_set):
