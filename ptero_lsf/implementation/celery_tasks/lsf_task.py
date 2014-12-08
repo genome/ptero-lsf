@@ -1,9 +1,5 @@
 from .. import models
-from sqlalchemy import func
 import celery
-import os
-import pwd
-import subprocess
 
 __all__ = ['LSFTask']
 
