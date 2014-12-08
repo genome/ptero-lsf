@@ -107,6 +107,8 @@ class BaseAPITest(unittest.TestCase):
 
     def set_queue(self, submit_data):
         if 'PTERO_LSF_TEST_QUEUE' in os.environ:
+            if 'options' not in submit_data:
+                submit_data['options'] = {}
             submit_data['options']['queue'] = os.environ['PTERO_LSF_TEST_QUEUE']
 
 def _deserialize_response(response):
