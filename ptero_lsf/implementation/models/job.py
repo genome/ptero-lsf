@@ -83,6 +83,9 @@ class Job(Base):
             'webhooks': self.webhooks,
         }
 
+        if self.poll_after:
+            result['pollAfter'] = self.poll_after.isoformat()
+
         self._conditional_add(result, 'options', 'options')
         self._conditional_add(result, 'rlimits', 'rLimits')
         self._conditional_add(result, 'lsf_job_id', 'lsfJobId')
