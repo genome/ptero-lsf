@@ -2,4 +2,4 @@ rabbit: RABBITMQ_LOG_BASE=$PWD/$PTERO_LSF_RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE
 redis: redis-server --port $PTERO_LSF_REDIS_PORT
 web: CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND python tests/scripts/web_wrapper.py
 worker: sudo CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND coverage run $(which celery) worker -n lsf_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app
-beat: CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND coverage run $(which celery) beat -A ptero_lsf.implementation.celery_app
+beat: CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND coverage run $(which celery) beat --schedule var/celerybeat-schedule -A ptero_lsf.implementation.celery_app
