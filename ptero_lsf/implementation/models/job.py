@@ -6,6 +6,7 @@ from sqlalchemy.orm import backref, relationship
 from sqlalchemy.orm import object_session
 import celery
 import datetime
+import lsf
 
 
 __all__ = ['Job']
@@ -73,6 +74,10 @@ class Job(Base):
             s.query(Job).filter_by(id=self.id).update({
                 'poll_after': self.polling_interval + datetime.datetime.now(),
             })
+
+    def submit(self):
+        return lsf.submit(str(self.command), options=self.options,
+                          rlimits=self.rlimits)
 
     @property
     def as_dict(self):

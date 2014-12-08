@@ -27,7 +27,7 @@ class Backend(object):
         job.set_status('NEW')
         self.session.commit()
 
-        task = self.lsf.delay(job.id, command, options)
+        task = self.lsf.delay(job.id)
 
         return job.id, job.as_dict
 
