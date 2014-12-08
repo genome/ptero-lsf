@@ -17,7 +17,7 @@ class Backend(object):
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask'
         ]
 
-    def create_job(self, command, options, pollingInterval):
+    def create_job(self, command, options, pollingInterval=900):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
         job = models.Job(command=command, options=options,
