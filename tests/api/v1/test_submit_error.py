@@ -1,4 +1,5 @@
 from .base import BaseAPITest
+import pprint
 
 
 class TestSubmitBadRequestShouldReturn400(BaseAPITest):
@@ -54,7 +55,11 @@ class TestLSFSubmitError(BaseAPITest):
         self.print_response(response)
         self.assertEqual(response.status_code, 201)
 
-        webhook_data = callback_server.stop()[0]
+        webhook_data = callback_server.stop()
+        pprint.pprint(webhook_data)
+        self.print_response(self.get(response.headers['Location']))
 
-        self.assertEqual(webhook_data['statusHistory'][0]['status'], 'NEW')
-        self.assertEqual(webhook_data['statusHistory'][1]['status'], 'ERRORED')
+        data = webhook_data[0]
+
+        self.assertEqual(data['statusHistory'][0]['status'], 'NEW')
+        self.assertEqual(data['statusHistory'][1]['status'], 'ERRORED')
