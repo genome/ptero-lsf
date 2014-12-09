@@ -1,10 +1,13 @@
 from .base import BaseAPITest
 import os
+import pprint
 import time
 
 
 class SubmitTest(BaseAPITest):
     def test_submit_small_job(self):
+        callback_server = self.create_callback_server([200])
+
         test_data = 'hello small job'
         outfile = self.make_tempfile()
         submit_data = {
@@ -14,6 +17,11 @@ class SubmitTest(BaseAPITest):
             },
             'rLimits': {
                 'cpuTime': 1,
+            },
+            'webhooks': {
+                'error': callback_server.url,
+                'failure': callback_server.url,
+                'success': callback_server.url,
             },
         }
         self.set_queue(submit_data)
@@ -30,7 +38,8 @@ class SubmitTest(BaseAPITest):
 
         self.print_response(status_response)
 
-        self.assertTrue(_wait_for_file(outfile))
+        webhook_data = callback_server.stop()
+        pprint.pprint(webhook_data)
 
         data = open(outfile).read()
         self.assertRegexpMatches(data, '%s.*' % test_data)
@@ -44,16 +53,3 @@ class SubmitTest(BaseAPITest):
             self.assertEqual(status_response.DATA[key], value)
 
         self.assertIsInstance(status_response.DATA['lsfJobId'], int)
-
-
-_MAX_TRIES = 30
-_POLLING_INTERVAL = 10
-def _wait_for_file(filename):
-    for i in xrange(_MAX_TRIES):
-        if os.path.isfile(filename):
-            return True
-
-        else:
-            time.sleep(_POLLING_INTERVAL)
-
-    return False
