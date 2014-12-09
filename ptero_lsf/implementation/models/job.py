@@ -21,8 +21,8 @@ _WEBHOOK_TO_TRIGGER = {
     'ERRORED': 'error',
     'FAILED': 'failure',
     'RUNNING': 'running',
-    'SUCCEEDED': 'success',
     'SCHEDULED': 'scheduled',
+    'SUCCEEDED': 'success',
     'SUSPENDED': 'suspended',
 }
 
