@@ -1,5 +1,4 @@
 from .base import BaseAPITest
-import pprint
 
 
 class TestSubmitBadRequestShouldReturn400(BaseAPITest):
@@ -52,8 +51,7 @@ class TestLSFSubmitError(BaseAPITest):
 
         response = self.post(self.jobs_url, submit_data)
 
-        pprint.pprint(response.headers)
-        pprint.pprint(response.DATA)
+        self.print_response(response)
         self.assertEqual(response.status_code, 201)
 
         webhook_data = callback_server.stop()[0]

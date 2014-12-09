@@ -1,6 +1,5 @@
 from .base import BaseAPITest
 import os
-import pprint
 import time
 
 
@@ -20,9 +19,8 @@ class SubmitTest(BaseAPITest):
         self.set_queue(submit_data)
 
         response = self.post(self.jobs_url, submit_data)
+        self.print_response(response)
 
-        pprint.pprint(response.headers)
-        pprint.pprint(response.DATA)
         self.assertEqual(response.status_code, 201)
 
         time.sleep(5)
@@ -30,7 +28,7 @@ class SubmitTest(BaseAPITest):
         status_response = self.get(response.headers['Location'])
         self.assertEqual(status_response.status_code, 200)
 
-        pprint.pprint(status_response.DATA)
+        self.print_response(status_response)
 
         self.assertTrue(_wait_for_file(outfile))
 
@@ -40,7 +38,7 @@ class SubmitTest(BaseAPITest):
         status_response = self.get(response.headers['Location'])
         self.assertEqual(status_response.status_code, 200)
 
-        pprint.pprint(status_response.DATA)
+        self.print_response(status_response)
 
         for key, value in submit_data.iteritems():
             self.assertEqual(status_response.DATA[key], value)
