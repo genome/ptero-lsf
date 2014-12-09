@@ -8,6 +8,10 @@
             "type": "string",
             "minLength": 1
         },
+        "rlimit": {
+            "type": "integer",
+            "minimum": 0
+        },
         "webhook": {
             "type": "string",
             "format": "uri",
@@ -63,13 +67,13 @@
         "rLimits": {
             "type": "object",
             "properties": {
-                "cpuTime": { "type": "integer" },
-                "RSS": { "type": "integer" },
-                "openFiles": { "type": "integer" },
-                "processes": { "type": "integer" },
-                "stack": { "type": "integer" },
-                "threads": { "type": "integer" },
-                "virtualMemory": { "type": "integer" }
+                "cpuTime": { "$ref": "#/definitions/rlimit" },
+                "RSS": { "$ref": "#/definitions/rlimit" },
+                "openFiles": { "$ref": "#/definitions/rlimit" },
+                "processes": { "$ref": "#/definitions/rlimit" },
+                "stack": { "$ref": "#/definitions/rlimit" },
+                "threads": { "$ref": "#/definitions/rlimit" },
+                "virtualMemory": { "$ref": "#/definitions/rlimit" }
             },
             "additionalProperties": false
         }
