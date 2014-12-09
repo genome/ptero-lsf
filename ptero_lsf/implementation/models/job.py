@@ -22,6 +22,7 @@ _WEBHOOK_TO_TRIGGER = {
     'FAILED': 'failure',
     'RUNNING': 'running',
     'SCHEDULED': 'scheduled',
+    'SUBMITTED': 'submit',
     'SUCCEEDED': 'success',
     'SUSPENDED': 'suspended',
 }
@@ -56,6 +57,8 @@ class Job(Base):
 
     def set_status(self, status):
         JobStatusHistory(job=self, status=status)
+        self.update_poll_after()
+        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(status))
 
     def update_status(self, lsf_status_set):
         current_status = _extract_status(lsf_status_set)
@@ -66,7 +69,8 @@ class Job(Base):
                          lsf_status_set=lsf_sorted_statuses,
                          lsf_primary_status=lsf_primary_status)
 
-        return _WEBHOOK_TO_TRIGGER.get(current_status)
+        self.update_poll_after()
+        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(current_status))
 
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:

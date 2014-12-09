@@ -13,6 +13,4 @@ class LSFTask(celery.Task):
 
         service_job.lsf_job_id = lsf_job.job_id
         service_job.set_status('SUBMITTED')
-        service_job.update_poll_after()
-        service_job.trigger_webhook('submit')
         session.commit()

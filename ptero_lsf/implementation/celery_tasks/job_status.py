@@ -15,7 +15,5 @@ class UpdateJobStatus(celery.Task):
 
         job_data = lsf_job.as_dict
 
-        webhook_to_trigger = service_job.update_status(job_data['statuses'])
-        service_job.update_poll_after()
-        service_job.trigger_webhook(webhook_to_trigger)
+        service_job.update_status(job_data['statuses'])
         session.commit()
