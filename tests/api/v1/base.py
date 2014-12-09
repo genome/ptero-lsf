@@ -83,6 +83,9 @@ class BaseAPITest(unittest.TestCase):
         file_object.close()
         return name
 
+    def make_tempdir(self):
+        return os.path.abspath(tempfile.mkdtemp(dir=self.job_working_directory))
+
     @property
     def job_user(self):
         return pwd.getpwuid(os.getuid())[0]
