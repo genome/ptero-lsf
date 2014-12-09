@@ -13,6 +13,9 @@ LOG = get_task_logger(__name__)
 class CommunicateLSFid(RuntimeError):
     pass
 
+class PreExecFailure(RuntimeError):
+    pass
+
 
 class LSFTask(celery.Task):
     def run(self, job_id):
@@ -25,9 +28,9 @@ class LSFTask(celery.Task):
             service_job.lsf_job_id = lsf_job_id
             service_job.set_status('SUBMITTED')
 
-        except:
+        except Exception as e:
             LOG.exception('Error submitting job')
-            service_job.set_status('ERRORED')
+            service_job.set_status('ERRORED', message=e.message)
 
         session.commit()
 
@@ -38,13 +41,20 @@ def _submit_job(service_job):
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 preexec_fn=lambda: _preexec_fn(service_job))
 
-        p.wait()
+        exit_code = p.wait()
+
+        raise RuntimeError('Got exit code: %s' % exit_code)
 
     except CommunicateLSFid as e:
         return int(e.message)
 
 
 def _preexec_fn(service_job):
-    os.chdir(service_job.cwd)
-    lsf_job = service_job.submit()
+    try:
+        os.chdir(service_job.cwd)
+        lsf_job = service_job.submit()
+
+    except Exception as e:
+        raise PreExecFailure(str(e))
+
     raise CommunicateLSFid(lsf_job.job_id)
