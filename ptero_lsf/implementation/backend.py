@@ -17,17 +17,17 @@ class Backend(object):
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask'
         ]
 
-    def create_job(self, command, options=None, webhooks=None,
+    def create_job(self, command, options=None, rLimits=None, webhooks=None,
                    pollingInterval=900):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
-        job = models.Job(command=command, options=options, webhooks=webhooks,
-                polling_interval=polling_interval)
+        job = models.Job(command=command, options=options, rlimits=rLimits,
+                webhooks=webhooks, polling_interval=polling_interval)
         self.session.add(job)
         job.set_status('NEW')
         self.session.commit()
 
-        task = self.lsf.delay(job.id, command, options)
+        self.lsf.delay(job.id)
 
         return job.id, job.as_dict
 
