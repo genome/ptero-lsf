@@ -11,9 +11,14 @@ class UpdateJobStatus(celery.Task):
         session = celery.current_app.Session()
         service_job = session.query(models.Job).get(job_id)
 
-        lsf_job = lsf.get_job(service_job.lsf_job_id)
+        if service_job.lsf_job_id is None:
+            service_job.set_status('ERRORED')
 
-        job_data = lsf_job.as_dict
+        else:
+            lsf_job = lsf.get_job(service_job.lsf_job_id)
 
-        service_job.update_status(job_data['statuses'])
+            job_data = lsf_job.as_dict
+
+            service_job.update_status(job_data['statuses'])
+
         session.commit()
