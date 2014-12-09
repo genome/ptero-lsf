@@ -37,7 +37,7 @@ class LSFTask(celery.Task):
 
 def _submit_job(service_job):
     try:
-        p = subprocess.Popen(['true'], close_fds=True, stdin=subprocess.PIPE,
+        p = subprocess.Popen(['true'], close_fds=False, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 preexec_fn=lambda: _preexec_fn(service_job))
 
