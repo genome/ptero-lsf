@@ -12,7 +12,8 @@ class UpdateJobStatus(celery.Task):
         service_job = session.query(models.Job).get(job_id)
 
         if service_job.lsf_job_id is None:
-            service_job.set_status('ERRORED')
+            service_job.set_status('ERRORED',
+                    message='LSF job id for job %s is None' % job_id)
 
         else:
             lsf_job = lsf.get_job(service_job.lsf_job_id)
