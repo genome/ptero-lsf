@@ -55,19 +55,20 @@ class Job(Base):
         if statuses:
             return statuses[-1]
 
-    def set_status(self, status):
-        JobStatusHistory(job=self, status=status)
+    def set_status(self, status, message=None):
+        JobStatusHistory(job=self, status=status, message=message)
         self.update_poll_after()
         self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(status))
 
-    def update_status(self, lsf_status_set):
+    def update_status(self, lsf_status_set, message=None):
         current_status = _extract_status(lsf_status_set)
         lsf_primary_status = _extract_primary_status(lsf_status_set)
         lsf_sorted_statuses = sorted(lsf_status_set)
 
         JobStatusHistory(job=self, status=current_status,
                          lsf_status_set=lsf_sorted_statuses,
-                         lsf_primary_status=lsf_primary_status)
+                         lsf_primary_status=lsf_primary_status,
+                         message=message)
 
         self.update_poll_after()
         self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(current_status))
@@ -154,6 +155,8 @@ class JobStatusHistory(Base):
     lsf_primary_status = Column(Text, index=True)
     lsf_status_set = Column(JSON)
 
+    message = Column(Text)
+
     job = relationship(Job,
                        backref=backref('status_history', order_by=timestamp))
 
@@ -163,6 +166,9 @@ class JobStatusHistory(Base):
             'timestamp': self.timestamp.isoformat(),
             'status': self.status,
         }
+
+        if self.message is not None:
+            result['message'] = self.message
 
         if self.lsf_primary_status is not None:
             result['lsfPrimaryStatus'] = self.lsf_primary_status
