@@ -22,7 +22,7 @@ class Backend(object):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
         job = models.Job(command=command, options=options, rlimits=rLimits,
-                webhooks=webhooks, polling_interval=polling_interval)
+                webhooks=webhooks, polling_interval=polling_interval, cwd=cwd)
         self.session.add(job)
         job.set_status('NEW')
         self.session.commit()

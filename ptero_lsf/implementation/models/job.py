@@ -36,6 +36,8 @@ class Job(Base):
     options = Column(JSON)
     rlimits = Column(JSON)
 
+    cwd = Column(Text, nullable=False)
+
     created_at = Column(DateTime(timezone=True), default=func.now(),
                         nullable=False)
 
@@ -83,6 +85,7 @@ class Job(Base):
     def as_dict(self):
         result = {
             'command': self.command,
+            'cwd': self.cwd,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
             'webhooks': self.webhooks,
