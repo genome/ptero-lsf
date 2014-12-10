@@ -63,6 +63,8 @@ class BaseAPITest(unittest.TestCase):
         self.api_port = os.environ['PTERO_LSF_PORT']
         self.tempdir = os.environ['PTERO_LSF_TEST_NETWORK_TEMP']
 
+        self._test_queue = os.environ.get('PTERO_LSF_TEST_QUEUE')
+
         self.job_working_directory = tempfile.mkdtemp(dir=self.tempdir)
 
     def tearDown(self):
@@ -110,10 +112,10 @@ class BaseAPITest(unittest.TestCase):
             data=json.dumps(data)))
 
     def set_queue(self, submit_data):
-        if 'PTERO_LSF_TEST_QUEUE' in os.environ:
+        if self._test_queue:
             if 'options' not in submit_data:
                 submit_data['options'] = {}
-            submit_data['options']['queue'] = os.environ['PTERO_LSF_TEST_QUEUE']
+            submit_data['options']['queue'] = self._test_queue
 
     def print_response(self, response):
         pprint.pprint(response.headers)
