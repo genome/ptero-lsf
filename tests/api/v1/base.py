@@ -2,6 +2,7 @@ import abc
 import json
 import os
 import platform
+import pprint
 import pwd
 import requests
 import shutil
@@ -83,6 +84,9 @@ class BaseAPITest(unittest.TestCase):
         file_object.close()
         return name
 
+    def make_tempdir(self):
+        return os.path.abspath(tempfile.mkdtemp(dir=self.job_working_directory))
+
     @property
     def job_user(self):
         return pwd.getpwuid(os.getuid())[0]
@@ -110,6 +114,10 @@ class BaseAPITest(unittest.TestCase):
             if 'options' not in submit_data:
                 submit_data['options'] = {}
             submit_data['options']['queue'] = os.environ['PTERO_LSF_TEST_QUEUE']
+
+    def print_response(self, response):
+        pprint.pprint(response.headers)
+        pprint.pprint(response.DATA)
 
 def _deserialize_response(response):
     response.DATA = response.json()

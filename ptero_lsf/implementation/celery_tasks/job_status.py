@@ -11,11 +11,15 @@ class UpdateJobStatus(celery.Task):
         session = celery.current_app.Session()
         service_job = session.query(models.Job).get(job_id)
 
-        lsf_job = lsf.get_job(service_job.lsf_job_id)
+        if service_job.lsf_job_id is None:
+            service_job.set_status('ERRORED',
+                    message='LSF job id for job %s is None' % job_id)
 
-        job_data = lsf_job.as_dict
+        else:
+            lsf_job = lsf.get_job(service_job.lsf_job_id)
 
-        webhook_to_trigger = service_job.update_status(job_data['statuses'])
-        service_job.update_poll_after()
-        service_job.trigger_webhook(webhook_to_trigger)
+            job_data = lsf_job.as_dict
+
+            service_job.update_status(job_data['statuses'])
+
         session.commit()

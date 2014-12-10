@@ -1,4 +1,5 @@
 from .base import BaseAPITest
+import pprint
 
 
 class TestSubmitBadRequestShouldReturn400(BaseAPITest):
@@ -31,3 +32,34 @@ class TestSubmitBadRequestShouldReturn400(BaseAPITest):
                 'invalidOption': 'foo',
             },
         })
+
+
+class TestLSFSubmitError(BaseAPITest):
+    def test_invalid_queue(self):
+        callback_server = self.create_callback_server([200])
+
+        submit_data = {
+            'command': 'invalidcommandnamethatcannotbefoundanywhere foo',
+            'options': {
+                'queue': 'thisisareallybogusqueuename',
+            },
+            'webhooks': {
+                'error': callback_server.url,
+                'failure': callback_server.url,
+                'success': callback_server.url,
+            },
+        }
+
+        response = self.post(self.jobs_url, submit_data)
+
+        self.print_response(response)
+        self.assertEqual(response.status_code, 201)
+
+        webhook_data = callback_server.stop()
+        pprint.pprint(webhook_data)
+        self.print_response(self.get(response.headers['Location']))
+
+        data = webhook_data[0]
+
+        self.assertEqual(data['statusHistory'][0]['status'], 'NEW')
+        self.assertEqual(data['statusHistory'][1]['status'], 'ERRORED')

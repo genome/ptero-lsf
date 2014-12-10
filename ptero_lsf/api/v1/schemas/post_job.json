@@ -76,6 +76,12 @@
                 "virtualMemory": { "$ref": "#/definitions/rlimit" }
             },
             "additionalProperties": false
+        },
+
+        "cwd": {
+            "type": "string",
+            "minLength": 1,
+            "default": "/tmp"
         }
     },
 

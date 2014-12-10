@@ -21,8 +21,9 @@ _WEBHOOK_TO_TRIGGER = {
     'ERRORED': 'error',
     'FAILED': 'failure',
     'RUNNING': 'running',
-    'SUCCEEDED': 'success',
     'SCHEDULED': 'scheduled',
+    'SUBMITTED': 'submit',
+    'SUCCEEDED': 'success',
     'SUSPENDED': 'suspended',
 }
 
@@ -35,6 +36,8 @@ class Job(Base):
     command = Column(Text, nullable=False)
     options = Column(JSON)
     rlimits = Column(JSON)
+
+    cwd = Column(Text, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=func.now(),
                         nullable=False)
@@ -52,19 +55,23 @@ class Job(Base):
         if statuses:
             return statuses[-1]
 
-    def set_status(self, status):
-        JobStatusHistory(job=self, status=status)
+    def set_status(self, status, message=None):
+        JobStatusHistory(job=self, status=status, message=message)
+        self.update_poll_after()
+        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(status))
 
-    def update_status(self, lsf_status_set):
+    def update_status(self, lsf_status_set, message=None):
         current_status = _extract_status(lsf_status_set)
         lsf_primary_status = _extract_primary_status(lsf_status_set)
         lsf_sorted_statuses = sorted(lsf_status_set)
 
         JobStatusHistory(job=self, status=current_status,
                          lsf_status_set=lsf_sorted_statuses,
-                         lsf_primary_status=lsf_primary_status)
+                         lsf_primary_status=lsf_primary_status,
+                         message=message)
 
-        return _WEBHOOK_TO_TRIGGER.get(current_status)
+        self.update_poll_after()
+        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(current_status))
 
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:
@@ -83,6 +90,7 @@ class Job(Base):
     def as_dict(self):
         result = {
             'command': self.command,
+            'cwd': self.cwd,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
             'webhooks': self.webhooks,
@@ -147,6 +155,8 @@ class JobStatusHistory(Base):
     lsf_primary_status = Column(Text, index=True)
     lsf_status_set = Column(JSON)
 
+    message = Column(Text)
+
     job = relationship(Job,
                        backref=backref('status_history', order_by=timestamp))
 
@@ -156,6 +166,9 @@ class JobStatusHistory(Base):
             'timestamp': self.timestamp.isoformat(),
             'status': self.status,
         }
+
+        if self.message is not None:
+            result['message'] = self.message
 
         if self.lsf_primary_status is not None:
             result['lsfPrimaryStatus'] = self.lsf_primary_status
