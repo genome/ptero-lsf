@@ -82,6 +82,10 @@
             "type": "string",
             "minLength": 1,
             "default": "/tmp"
+        },
+        "environment": {
+            "type": "object",
+            "items": { "$ref": "#/definitions/name" }
         }
     },
 

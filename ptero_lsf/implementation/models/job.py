@@ -38,6 +38,7 @@ class Job(Base):
     rlimits = Column(JSON)
 
     cwd = Column(Text, nullable=False)
+    environment = Column(JSON, default=dict)
 
     created_at = Column(DateTime(timezone=True), default=func.now(),
                         nullable=False)

@@ -18,11 +18,12 @@ class Backend(object):
         ]
 
     def create_job(self, command, options=None, rLimits=None, webhooks=None,
-                   pollingInterval=900, cwd='/tmp'):
+                   pollingInterval=900, cwd='/tmp', environment=None):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
         job = models.Job(command=command, options=options, rlimits=rLimits,
-                webhooks=webhooks, polling_interval=polling_interval, cwd=cwd)
+                webhooks=webhooks, polling_interval=polling_interval, cwd=cwd,
+                environment=environment)
         self.session.add(job)
         job.set_status('NEW')
         self.session.commit()
