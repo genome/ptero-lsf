@@ -4,7 +4,7 @@
     "description": "Submit a new job.",
 
     "definitions": {
-        "command": {
+        "name": {
             "type": "string",
             "minLength": 1
         },
@@ -21,7 +21,7 @@
 
     "type": "object",
     "properties": {
-        "command": { "$ref": "#/definitions/command" },
+        "command": { "$ref": "#/definitions/name" },
         "pollingInterval": {
             "type": "integer",
             "default": 900,
@@ -54,8 +54,8 @@
                 "maxNumProcessors": { "type": "integer" },
                 "numProcessors": { "type": "integer" },
                 "outFile": { "type": "string" },
-                "preExecCmd": { "$ref": "#/definitions/command" },
-                "postExecCmd": { "$ref": "#/definitions/command" },
+                "preExecCmd": { "$ref": "#/definitions/name" },
+                "postExecCmd": { "$ref": "#/definitions/name" },
                 "projectName": { "type": "string" },
                 "queue": { "type": "string" },
                 "resReq": { "type": "string" },
