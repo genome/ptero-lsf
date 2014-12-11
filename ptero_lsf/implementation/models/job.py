@@ -8,6 +8,7 @@ import celery
 import datetime
 import lsf
 import os
+import pwd
 
 
 __all__ = ['Job']
@@ -50,6 +51,7 @@ class Job(Base):
     poll_after = Column(DateTime, nullable=True, index=True)
     polling_interval = Column(Interval, nullable=False)
 
+    user = Column(Text, nullable=False, index=True)
     webhooks = Column(JSON, default=lambda: {}, nullable=False)
 
     @property
@@ -100,6 +102,10 @@ class Job(Base):
         if self.umask is not None:
             os.umask(self.umask)
 
+    def set_user(self):
+        pw_ent = pwd.getpwnam(self.user)
+        os.setreuid(pw_ent.pw_uid, pw_ent.pw_uid)
+
     @property
     def as_dict(self):
         result = {
@@ -108,6 +114,7 @@ class Job(Base):
             'environment': self.environment,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
+            'user': self.user,
             'webhooks': self.webhooks,
         }
 

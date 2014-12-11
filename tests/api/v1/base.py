@@ -113,12 +113,16 @@ class BaseAPITest(unittest.TestCase):
 
     def update_submit_data(self, submit_data):
         self.set_queue(submit_data)
+        self.set_user(submit_data)
 
     def set_queue(self, submit_data):
         if self._test_queue:
             if 'options' not in submit_data:
                 submit_data['options'] = {}
             submit_data['options']['queue'] = self._test_queue
+
+    def set_user(self, submit_data):
+        submit_data['user'] = self.job_user
 
     def print_response(self, response):
         pprint.pprint(response.headers)

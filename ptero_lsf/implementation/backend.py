@@ -19,7 +19,7 @@ class Backend(object):
 
     def create_job(self, command, options=None, rLimits=None, webhooks=None,
                    pollingInterval=900, cwd='/tmp', environment=None,
-                   umask=None):
+                   umask=None, user=None):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
         if umask is not None:
@@ -27,7 +27,7 @@ class Backend(object):
 
         job = models.Job(command=command, options=options, rlimits=rLimits,
                 webhooks=webhooks, polling_interval=polling_interval, cwd=cwd,
-                environment=environment, umask=umask)
+                environment=environment, umask=umask, user=user)
         self.session.add(job)
         job.set_status('NEW')
         self.session.commit()
