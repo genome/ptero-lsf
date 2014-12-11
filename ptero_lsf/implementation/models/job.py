@@ -39,6 +39,7 @@ class Job(Base):
 
     cwd = Column(Text, nullable=False)
     environment = Column(JSON, default=dict)
+    umask = Column(Integer)
 
     created_at = Column(DateTime(timezone=True), default=func.now(),
                         nullable=False)
