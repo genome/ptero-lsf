@@ -7,6 +7,7 @@ from sqlalchemy.orm import object_session
 import celery
 import datetime
 import lsf
+import os
 
 
 __all__ = ['Job']
@@ -87,6 +88,17 @@ class Job(Base):
     def submit(self):
         return lsf.submit(str(self.command), options=self.options,
                           rlimits=self.rlimits)
+
+    def set_cwd(self):
+        os.chdir(self.cwd)
+
+    def set_environment(self):
+        os.environ.clear()
+        os.environ.update(self.environment)
+
+    def set_umask(self):
+        if self.umask is not None:
+            os.umask(self.umask)
 
     @property
     def as_dict(self):

@@ -50,10 +50,11 @@ def _submit_job(child_pipe, parent_pipe, service_job):
     try:
         parent_pipe.close()
 
-        os.chdir(service_job.cwd)
+        service_job.set_environment()
+        os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
 
-        _set_environment(service_job)
-        _set_umask(service_job)
+        service_job.set_cwd()
+        service_job.set_umask()
 
         lsf_job = service_job.submit()
         child_pipe.send(lsf_job.job_id)
@@ -89,14 +90,3 @@ def _fork_and_submit_job(service_job):
         parent_pipe.close()
 
     return result
-
-
-def _set_environment(service_job):
-    os.environ.clear()
-    os.environ.update(service_job.environment)
-    os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
-
-
-def _set_umask(service_job):
-    if service_job.umask is not None:
-        os.umask(service_job.umask)
