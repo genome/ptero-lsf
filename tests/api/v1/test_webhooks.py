@@ -12,7 +12,7 @@ class TestWebhooks(BaseAPITest):
                 'submit': callback_server.url,
             },
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         post_response = self.post(self.jobs_url, submit_data)
 
@@ -34,7 +34,7 @@ class TestWebhooks(BaseAPITest):
                 'success': callback_server.url,
             },
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         post_response = self.post(self.jobs_url, submit_data)
 
@@ -56,7 +56,7 @@ class TestWebhooks(BaseAPITest):
                 'failure': callback_server.url,
             },
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         post_response = self.post(self.jobs_url, submit_data)
 
@@ -79,7 +79,7 @@ class TestWebhooks(BaseAPITest):
                 'failure': callback_server.url,
             },
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         post_response = self.post(self.jobs_url, submit_data)
 
@@ -102,7 +102,7 @@ class TestWebhooks(BaseAPITest):
                 'failure': callback_server.url,
             },
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         post_response = self.post(self.jobs_url, submit_data)
 

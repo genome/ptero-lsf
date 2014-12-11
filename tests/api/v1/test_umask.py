@@ -25,7 +25,7 @@ class TestUmask(BaseAPITest):
             'cwd': self.job_working_directory,
             'umask': '0377',
         }
-        self.set_queue(submit_data)
+        self.update_submit_data(submit_data)
 
         response = self.post(self.jobs_url, submit_data)
         self.print_response(response)

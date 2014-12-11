@@ -40,15 +40,15 @@ class TestLSFSubmitError(BaseAPITest):
 
         submit_data = {
             'command': 'invalidcommandnamethatcannotbefoundanywhere foo',
-            'options': {
-                'queue': 'thisisareallybogusqueuename',
-            },
             'webhooks': {
                 'error': callback_server.url,
                 'failure': callback_server.url,
                 'success': callback_server.url,
             },
         }
+        self.update_submit_data(submit_data)
+        submit_data.setdefault('options', {})['queue'] =\
+                'thisisareallybogusqueuename'
 
         response = self.post(self.jobs_url, submit_data)
 

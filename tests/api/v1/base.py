@@ -111,6 +111,9 @@ class BaseAPITest(unittest.TestCase):
             headers={'content-type': 'application/json'},
             data=json.dumps(data)))
 
+    def update_submit_data(self, submit_data):
+        self.set_queue(submit_data)
+
     def set_queue(self, submit_data):
         if self._test_queue:
             if 'options' not in submit_data:
