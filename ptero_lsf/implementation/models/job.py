@@ -105,6 +105,7 @@ class Job(Base):
         result = {
             'command': self.command,
             'cwd': self.cwd,
+            'environment': self.environment,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
             'webhooks': self.webhooks,
@@ -116,6 +117,7 @@ class Job(Base):
         self._conditional_add(result, 'options', 'options')
         self._conditional_add(result, 'rlimits', 'rLimits')
         self._conditional_add(result, 'lsf_job_id', 'lsfJobId')
+        self._conditional_add(result, 'umask', 'umask')
 
         return result
 
