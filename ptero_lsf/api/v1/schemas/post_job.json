@@ -88,9 +88,8 @@
             "items": { "$ref": "#/definitions/name" }
         },
         "umask": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4095
+            "type": "string",
+            "pattern": "^0[0-7]{3,4}$"
         }
     },
 

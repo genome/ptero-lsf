@@ -114,10 +114,12 @@ class Job(Base):
         if self.poll_after:
             result['pollAfter'] = self.poll_after.isoformat()
 
+        if self.umask is not None:
+            result['umask'] = oct(self.umask)
+
         self._conditional_add(result, 'options', 'options')
         self._conditional_add(result, 'rlimits', 'rLimits')
         self._conditional_add(result, 'lsf_job_id', 'lsfJobId')
-        self._conditional_add(result, 'umask', 'umask')
 
         return result
 

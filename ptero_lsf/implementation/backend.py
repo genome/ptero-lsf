@@ -22,6 +22,9 @@ class Backend(object):
                    umask=None):
         polling_interval = datetime.timedelta(seconds=pollingInterval)
 
+        if umask is not None:
+            umask = int(umask, 8)
+
         job = models.Job(command=command, options=options, rlimits=rLimits,
                 webhooks=webhooks, polling_interval=polling_interval, cwd=cwd,
                 environment=environment, umask=umask)

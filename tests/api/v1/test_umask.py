@@ -23,7 +23,7 @@ class TestUmask(BaseAPITest):
                 'success': callback_server.url,
             },
             'cwd': self.job_working_directory,
-            'umask': 0377,
+            'umask': '0377',
         }
         self.set_queue(submit_data)
 
