@@ -3,11 +3,25 @@ from multiprocessing import Pipe, Process
 from celery.utils.log import get_task_logger
 import celery
 import os
+import re
 
 __all__ = ['LSFTask']
 
 
 LOG = get_task_logger(__name__)
+
+
+def _collect_lsf_environment():
+    regex = re.compile(r'^LSF_.+')
+    result = {}
+    for key, value in os.environ.iteritems():
+        if regex.match(key):
+            result[key] = value
+
+    return result
+
+
+_LSF_ENVIRONMENT_VARIABLES = _collect_lsf_environment()
 
 
 class SubmitError(Exception):
@@ -36,7 +50,11 @@ def _submit_job(child_pipe, parent_pipe, service_job):
     try:
         parent_pipe.close()
 
-        os.chdir(service_job.cwd)
+        service_job.set_environment()
+        os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
+
+        service_job.set_cwd()
+        service_job.set_umask()
 
         lsf_job = service_job.submit()
         child_pipe.send(lsf_job.job_id)

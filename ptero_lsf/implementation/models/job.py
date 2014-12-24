@@ -7,6 +7,7 @@ from sqlalchemy.orm import object_session
 import celery
 import datetime
 import lsf
+import os
 
 
 __all__ = ['Job']
@@ -38,6 +39,8 @@ class Job(Base):
     rlimits = Column(JSON)
 
     cwd = Column(Text, nullable=False)
+    environment = Column(JSON, default=dict)
+    umask = Column(Integer)
 
     created_at = Column(DateTime(timezone=True), default=func.now(),
                         nullable=False)
@@ -86,11 +89,23 @@ class Job(Base):
         return lsf.submit(str(self.command), options=self.options,
                           rlimits=self.rlimits)
 
+    def set_cwd(self):
+        os.chdir(self.cwd)
+
+    def set_environment(self):
+        os.environ.clear()
+        os.environ.update(self.environment)
+
+    def set_umask(self):
+        if self.umask is not None:
+            os.umask(self.umask)
+
     @property
     def as_dict(self):
         result = {
             'command': self.command,
             'cwd': self.cwd,
+            'environment': self.environment,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
             'webhooks': self.webhooks,
@@ -98,6 +113,9 @@ class Job(Base):
 
         if self.poll_after:
             result['pollAfter'] = self.poll_after.isoformat()
+
+        if self.umask is not None:
+            result['umask'] = oct(self.umask)
 
         self._conditional_add(result, 'options', 'options')
         self._conditional_add(result, 'rlimits', 'rLimits')
