@@ -90,6 +90,12 @@
         "umask": {
             "type": "string",
             "pattern": "^0?[0-7]{3,4}$"
+        },
+        "user": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The username of the user to run as.  Cannot be 'root'",
+            "pattern": "^(.+[^(root)])|([^(root)].+)$"
         }
     },
 
