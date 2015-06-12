@@ -30,7 +30,8 @@ class SubmitError(Exception):
 
 class LSFTask(celery.Task):
     def run(self, job_id):
-        session = celery.current_app.Session()
+        backend = celery.current_app.factory.create_backend()
+        session = backend.session
         service_job = session.query(models.Job).get(job_id)
 
         try:

@@ -1,4 +1,5 @@
 from celery.signals import worker_init
+from factory import Factory
 import celery
 import os
 import sqlalchemy
@@ -34,13 +35,8 @@ app.conf['CELERYBEAT_SCHEDULE'] = {
     },
 }
 
-app.Session = sqlalchemy.orm.sessionmaker()
-
-
 @worker_init.connect
 def initialize_sqlalchemy_session(signal, sender):
-    from . import models
-
-    engine = sqlalchemy.create_engine(os.environ['PTERO_LSF_DB_STRING'])
-    models.Base.metadata.create_all(engine)
-    app.Session.configure(bind=engine)
+    app.factory = Factory(
+        database_url=os.environ.get('PTERO_LSF_DB_STRING',
+            'sqlite://'), celery_app=app)

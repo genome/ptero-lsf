@@ -7,7 +7,8 @@ __all__ = ['LSFTask']
 
 class PollActiveJobs(celery.Task):
     def run(self):
-        session = celery.current_app.Session()
+        backend = celery.current_app.factory.create_backend()
+        session = backend.session
         job_ids = session.query(models.Job.id)\
                 .filter(models.Job.poll_after <= func.now()).all()
 

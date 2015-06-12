@@ -8,7 +8,8 @@ __all__ = ['UpdateJobStatus']
 
 class UpdateJobStatus(celery.Task):
     def run(self, job_id):
-        session = celery.current_app.Session()
+        backend = celery.current_app.factory.create_backend()
+        session = backend.session
         service_job = session.query(models.Job).get(job_id)
 
         if service_job.lsf_job_id is None:

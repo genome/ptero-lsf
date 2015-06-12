@@ -6,8 +6,8 @@ __all__ = ['Factory']
 
 
 class Factory(object):
-    def __init__(self, database_url):
-        self.celery_app = None
+    def __init__(self, database_url, celery_app=None):
+        self.celery_app = celery_app
         self.database_url = database_url
         self._initialized = False
 
