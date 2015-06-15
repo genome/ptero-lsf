@@ -1,5 +1,6 @@
-from celery.signals import worker_init
+from celery.signals import worker_init, setup_logging
 from factory import Factory
+from ptero_common.logging_configuration import configure_celery_logging
 import celery
 import os
 import sqlalchemy
@@ -34,6 +35,10 @@ app.conf['CELERYBEAT_SCHEDULE'] = {
         'schedule': 10,
     },
 }
+
+@setup_logging.connect
+def setup_celery_logging(**kwargs):
+    configure_celery_logging('LSF')
 
 @worker_init.connect
 def initialize_sqlalchemy_session(signal, sender):

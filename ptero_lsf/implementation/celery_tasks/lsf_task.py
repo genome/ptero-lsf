@@ -1,14 +1,13 @@
 from .. import models
 from multiprocessing import Pipe, Process
-from celery.utils.log import get_task_logger
 import celery
+import logging
 import os
 import re
 
+
+LOG = logging.getLogger(__name__)
 __all__ = ['LSFTask']
-
-
-LOG = get_task_logger(__name__)
 
 
 def _collect_lsf_environment():
