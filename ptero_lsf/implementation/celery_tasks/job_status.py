@@ -1,4 +1,5 @@
 from .. import models
+from ptero_lsf.implementation import statuses
 from sqlalchemy import func
 import celery
 import lsf
@@ -13,7 +14,7 @@ class UpdateJobStatus(celery.Task):
         service_job = session.query(models.Job).get(job_id)
 
         if service_job.lsf_job_id is None:
-            service_job.set_status('ERRORED',
+            service_job.set_status(statuses.errored,
                     message='LSF job id for job %s is None' % job_id)
 
         else:

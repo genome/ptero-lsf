@@ -1,5 +1,6 @@
 from .base import Base
 from json_type import JSON
+from ptero_lsf.implementation import statuses
 from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
@@ -15,16 +16,16 @@ __all__ = ['Job']
 
 
 _TERMINAL_STATUSES = {
-    'ERRORED',
-    'FAILED',
-    'SUCCEEDED',
+    statuses.errored,
+    statuses.failed,
+    statuses.succeeded,
 }
 _WEBHOOK_TO_TRIGGER = {
-    'ERRORED': 'errored',
-    'FAILED': 'failed',
-    'RUNNING': 'running',
-    'SCHEDULED': 'scheduled',
-    'SUCCEEDED': 'succeeded',
+    statuses.errored: statuses.errored,
+    statuses.failed: statuses.failed,
+    statuses.running: statuses.running,
+    statuses.scheduled: statuses.scheduled,
+    statuses.succeeded: statuses.succeeded,
 }
 
 
@@ -143,14 +144,14 @@ class Job(Base):
 
 
 _STATUS_MAP = {
-    'DONE': 'SUCCEEDED',
-    'EXIT': 'FAILED',
-    'PEND': 'SCHEDULED',
-    'PSUSP': 'SUSPENDED',
-    'RUN': 'RUNNING',
-    'SSUSP': 'SUSPENDED',
-    'USUSP': 'SUSPENDED',
-    'WAIT': 'WAITING',
+    'DONE': statuses.succeeded,
+    'EXIT': statuses.failed,
+    'PEND': statuses.scheduled,
+    'PSUSP': statuses.suspended,
+    'RUN': statuses.running,
+    'SSUSP': statuses.suspended,
+    'USUSP': statuses.suspended,
+    'WAIT': statuses.waiting,
 }
 
 def _extract_status(lsf_status_set):

@@ -1,5 +1,6 @@
 from . import celery_tasks
 from . import models
+from ptero_lsf.implementation import statuses
 import datetime
 
 
@@ -29,7 +30,7 @@ class Backend(object):
                 webhooks=webhooks, polling_interval=polling_interval, cwd=cwd,
                 environment=environment, umask=umask, user=user)
         self.session.add(job)
-        job.set_status('NEW')
+        job.set_status(statuses.new)
         self.session.commit()
 
         self.lsf.delay(job.id)

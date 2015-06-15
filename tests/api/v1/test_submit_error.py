@@ -61,5 +61,5 @@ class TestLSFSubmitError(BaseAPITest):
 
         data = webhook_data[0]
 
-        self.assertEqual(data['statusHistory'][0]['status'], 'NEW')
-        self.assertEqual(data['statusHistory'][1]['status'], 'ERRORED')
+        self.assertEqual(data['statusHistory'][0]['status'], 'new')
+        self.assertEqual(data['statusHistory'][1]['status'], 'errored')

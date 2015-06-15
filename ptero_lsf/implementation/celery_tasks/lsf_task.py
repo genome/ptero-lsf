@@ -1,5 +1,6 @@
 from .. import models
 from multiprocessing import Pipe, Process
+from ptero_lsf.implementation import statuses
 import celery
 import logging
 import os
@@ -37,11 +38,11 @@ class LSFTask(celery.Task):
             lsf_job_id = _fork_and_submit_job(service_job)
 
             service_job.lsf_job_id = lsf_job_id
-            service_job.set_status('SCHEDULED')
+            service_job.set_status(statuses.scheduled)
 
         except Exception as e:
             LOG.exception('Error submitting job')
-            service_job.set_status('ERRORED', message=e.message)
+            service_job.set_status(statuses.errored, message=e.message)
 
         session.commit()
 
