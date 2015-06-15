@@ -14,6 +14,7 @@ class JobListView(Resource):
         try:
             data = validators.get_job_post_data()
         except Exception as e:
+            LOG.exception(e)
             return {'error': e.message}, 400
 
         job_id, job_data = g.backend.create_job(**data)

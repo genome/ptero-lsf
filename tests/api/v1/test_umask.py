@@ -18,9 +18,9 @@ class TestUmask(BaseAPITest):
                 'outFile': outfile,
             },
             'webhooks': {
-                'error': callback_server.url,
-                'failure': callback_server.url,
-                'success': callback_server.url,
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
             },
             'cwd': self.job_working_directory,
             'umask': '0377',

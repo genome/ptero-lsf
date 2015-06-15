@@ -14,9 +14,18 @@
         },
         "webhook": {
             "type": "string",
-            "format": "uri",
-            "minLength": 1
-        }
+            "description": "TODO does the 'uri' format enforce a non-zero length? do we want to enforce that?",
+            "format": "uri"
+        },
+        "webhook_list": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/webhook" },
+            "minItems": 1
+        },
+        "webhook_entry": { "oneOf": [
+            { "$ref": "#/definitions/webhook" },
+            { "$ref": "#/definitions/webhook_list" }
+        ]}
     },
 
     "type": "object",
@@ -32,14 +41,15 @@
         "webhooks": {
             "type": "object",
             "properties": {
-                "error": { "$ref": "#/definitions/webhook" },
-                "failure": { "$ref": "#/definitions/webhook" },
-                "running": { "$ref": "#/definitions/webhook" },
-                "scheduled": { "$ref": "#/definitions/webhook" },
-                "submit": { "$ref": "#/definitions/webhook" },
-                "success": { "$ref": "#/definitions/webhook" },
-                "suspended": { "$ref": "#/definitions/webhook" }
-            }
+                "scheduled": { "$ref": "#/definitions/webhook_entry" },
+                "running":   { "$ref": "#/definitions/webhook_entry" },
+                "succeeded": { "$ref": "#/definitions/webhook_entry" },
+                "failed":    { "$ref": "#/definitions/webhook_entry" },
+                "errored":   { "$ref": "#/definitions/webhook_entry" },
+                "canceled":  { "$ref": "#/definitions/webhook_entry" },
+                "ended":     { "$ref": "#/definitions/webhook_entry" }
+            },
+            "additionalProperties": false
         },
 
         "options": {

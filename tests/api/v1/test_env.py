@@ -32,9 +32,9 @@ class TestEnvironment(BaseAPITest):
                 'outFile': outfile,
             },
             'webhooks': {
-                'error': self.callback_server.url,
-                'failure': self.callback_server.url,
-                'success': self.callback_server.url,
+                'errored': self.callback_server.url,
+                'failed': self.callback_server.url,
+                'succeeded': self.callback_server.url,
             },
             'cwd': self.job_working_directory,
             'environment': self.test_environment,

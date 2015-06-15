@@ -3,13 +3,13 @@ import pprint
 
 
 class TestWebhooks(BaseAPITest):
-    def test_submit_webhook(self):
+    def test_scheduled_webhook(self):
         callback_server = self.create_callback_server([200])
 
         submit_data = {
             'command': 'true',
             'webhooks': {
-                'submit': callback_server.url,
+                'scheduled': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
@@ -30,8 +30,8 @@ class TestWebhooks(BaseAPITest):
             'command': 'true',
             'pollingInterval': 30,
             'webhooks': {
-                'submit': callback_server.url,
-                'success': callback_server.url,
+                'scheduled': callback_server.url,
+                'succeeded': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
@@ -52,8 +52,8 @@ class TestWebhooks(BaseAPITest):
             'command': 'false',
             'pollingInterval': 30,
             'webhooks': {
-                'submit': callback_server.url,
-                'failure': callback_server.url,
+                'scheduled': callback_server.url,
+                'failed': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
@@ -74,9 +74,9 @@ class TestWebhooks(BaseAPITest):
             'command': 'true',
             'pollingInterval': 30,
             'webhooks': {
-                'submit': callback_server.url,
-                'success': callback_server.url,
-                'failure': callback_server.url,
+                'scheduled': callback_server.url,
+                'succeeded': callback_server.url,
+                'failed': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
@@ -97,9 +97,9 @@ class TestWebhooks(BaseAPITest):
             'command': 'false',
             'pollingInterval': 30,
             'webhooks': {
-                'submit': callback_server.url,
-                'success': callback_server.url,
-                'failure': callback_server.url,
+                'scheduled': callback_server.url,
+                'succeeded': callback_server.url,
+                'failed': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)

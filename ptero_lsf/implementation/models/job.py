@@ -20,13 +20,11 @@ _TERMINAL_STATUSES = {
     'SUCCEEDED',
 }
 _WEBHOOK_TO_TRIGGER = {
-    'ERRORED': 'error',
-    'FAILED': 'failure',
+    'ERRORED': 'errored',
+    'FAILED': 'failed',
     'RUNNING': 'running',
     'SCHEDULED': 'scheduled',
-    'SUBMITTED': 'submit',
-    'SUCCEEDED': 'success',
-    'SUSPENDED': 'suspended',
+    'SUCCEEDED': 'succeeded',
 }
 
 

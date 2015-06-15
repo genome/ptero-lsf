@@ -41,9 +41,9 @@ class TestLSFSubmitError(BaseAPITest):
         submit_data = {
             'command': 'invalidcommandnamethatcannotbefoundanywhere foo',
             'webhooks': {
-                'error': callback_server.url,
-                'failure': callback_server.url,
-                'success': callback_server.url,
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
