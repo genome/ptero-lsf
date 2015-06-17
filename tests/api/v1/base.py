@@ -34,7 +34,14 @@ class CallbackServer:
     def stop(self):
         if self._webserver is not None:
             stdout, stderr = self._webserver.communicate()
+            rc = self._webserver.returncode
             self._webserver = None
+
+            if rc == -14:
+                raise RuntimeError('logging_webserver timed out')
+            elif rc != 0:
+                raise RuntimeError('logging_webserver failed with return code %s' % rc)
+
             if stdout:
                 return map(json.loads, stdout.split('\n')[:-1])
         return []
