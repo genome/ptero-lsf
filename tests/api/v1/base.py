@@ -59,7 +59,7 @@ class CallbackServer:
 
     @property
     def _timeout(self):
-        return 60
+        return 120
 
 
 class BaseAPITest(unittest.TestCase):
