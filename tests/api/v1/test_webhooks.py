@@ -21,7 +21,7 @@ class TestWebhooks(BaseAPITest):
         self.assertIsInstance(webhook_data['lsfJobId'], int)
         self.assertEqual(webhook_data['statusHistory'][0]['status'], 'NEW')
         self.assertEqual(webhook_data['statusHistory'][1]['status'],
-                'SUBMITTED')
+                'SCHEDULED')
 
     def test_success_and_failure_webhook_with_success(self):
         callback_server = self.create_callback_server([200])

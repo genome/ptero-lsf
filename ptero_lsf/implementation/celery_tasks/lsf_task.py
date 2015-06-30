@@ -37,7 +37,7 @@ class LSFTask(celery.Task):
             lsf_job_id = _fork_and_submit_job(service_job)
 
             service_job.lsf_job_id = lsf_job_id
-            service_job.set_status('SUBMITTED')
+            service_job.set_status('SCHEDULED')
 
         except Exception as e:
             LOG.exception('Error submitting job')
