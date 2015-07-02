@@ -14,6 +14,8 @@ app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 app.conf['CELERY_ROUTES'] = (
     {
         'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask': {'queue': 'lsftask'},
+        'ptero_lsf.implementation.celery_tasks.polling.PollActiveJobs': {'queue': 'poll'},
+        'ptero_lsf.implementation.celery_tasks.job_status.UpdateJobStatus': {'queue': 'update'},
         'ptero_common.celery.http.HTTP': {'queue': 'http'},
         'ptero_common.celery.http.HTTPWithResult': {'queue': 'http'},
     },
