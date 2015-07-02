@@ -11,6 +11,12 @@ TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
 
 app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
+app.conf['CELERY_ROUTES'] = (
+    {
+        'ptero_common.celery.http.HTTP': {'queue': 'http'},
+        'ptero_common.celery.http.HTTPWithResult': {'queue': 'http'},
+    },
+)
 
 _DEFAULT_CELERY_CONFIG = {
     'CELERY_BROKER_URL': 'amqp://localhost',

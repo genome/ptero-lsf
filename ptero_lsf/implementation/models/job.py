@@ -138,9 +138,8 @@ class Job(Base):
         if webhook_name:
             webhook_url = self.webhooks.get(webhook_name)
             if webhook_url:
-                celery.current_app.tasks[
-'ptero_lsf.implementation.celery_tasks.http_callback.HTTPCallbackTask'
-                ].delay(webhook_url, **self.as_dict)
+                celery.current_app.tasks['ptero_common.celery.http.HTTP'
+                        ].delay('PUT', webhook_url, **self.as_dict)
 
 
 _STATUS_MAP = {
