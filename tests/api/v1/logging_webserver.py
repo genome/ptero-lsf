@@ -41,7 +41,7 @@ def next_response_code():
 app = Flask(__name__)
 
 
-@app.route('/', methods=['PUT'])
+@app.route('/', methods=['POST'])
 def log_request():
     print(request.data)
     return '', next_response_code()

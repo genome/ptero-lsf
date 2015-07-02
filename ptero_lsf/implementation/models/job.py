@@ -139,7 +139,7 @@ class Job(Base):
             webhook_url = self.webhooks.get(webhook_name)
             if webhook_url:
                 celery.current_app.tasks['ptero_common.celery.http.HTTP'
-                        ].delay('PUT', webhook_url, **self.as_dict)
+                        ].delay('POST', webhook_url, **self.as_dict)
 
 
 _STATUS_MAP = {
