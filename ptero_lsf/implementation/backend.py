@@ -1,4 +1,4 @@
-from . import celery_tasks
+from . import celery_tasks  # noqa
 from . import models
 from ptero_lsf.implementation import statuses
 import datetime

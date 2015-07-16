@@ -146,6 +146,7 @@ _STATUS_MAP = {
     'WAIT': statuses.waiting,
 }
 
+
 def _extract_status(lsf_status_set):
     for lsf_status, status in _STATUS_MAP.iteritems():
         if lsf_status in lsf_status_set:

@@ -2,8 +2,6 @@ from .. import models
 import celery
 from sqlalchemy import func
 
-__all__ = ['LSFTask']
-
 
 class PollActiveJobs(celery.Task):
     def run(self):

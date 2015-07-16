@@ -1,5 +1,5 @@
 from . import validators
-from flask import g, request, url_for
+from flask import g, url_for
 from flask.ext.restful import Resource
 from ptero_common.logging_configuration import logged_response
 import logging

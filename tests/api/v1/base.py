@@ -1,7 +1,6 @@
 import abc
 import json
 import os
-import platform
 import pprint
 import pwd
 import requests
@@ -40,7 +39,8 @@ class CallbackServer:
             if rc == -14:
                 raise RuntimeError('logging_webserver timed out')
             elif rc != 0:
-                raise RuntimeError('logging_webserver failed with return code %s' % rc)
+                raise RuntimeError(
+                    'logging_webserver failed with return code %s' % rc)
 
             if stdout:
                 return map(json.loads, stdout.split('\n')[:-1])
@@ -134,6 +134,7 @@ class BaseAPITest(unittest.TestCase):
     def print_response(self, response):
         pprint.pprint(response.headers)
         pprint.pprint(response.DATA)
+
 
 def _deserialize_response(response):
     response.DATA = response.json()

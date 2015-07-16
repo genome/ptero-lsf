@@ -1,7 +1,6 @@
 from ptero_lsf.api import application
 from ptero_common.logging_configuration import configure_web_logging
 import argparse
-import logging
 import os
 
 app = application.create_app()

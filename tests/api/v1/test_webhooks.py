@@ -14,13 +14,14 @@ class TestWebhooks(BaseAPITest):
         }
         self.update_submit_data(submit_data)
 
-        post_response = self.post(self.jobs_url, submit_data)
+        self.post(self.jobs_url, submit_data)
 
         webhook_data = callback_server.stop()[0]
 
         self.assertIsInstance(webhook_data['lsfJobId'], int)
         self.assertEqual(webhook_data['statusHistory'][0]['status'], 'new')
-        self.assertEqual(webhook_data['statusHistory'][1]['status'], 'scheduled')
+        self.assertEqual(webhook_data['statusHistory'][1]['status'],
+            'scheduled')
 
     def test_success_and_failure_webhook_with_success(self):
         callback_server = self.create_callback_server([200])
@@ -35,7 +36,7 @@ class TestWebhooks(BaseAPITest):
         }
         self.update_submit_data(submit_data)
 
-        post_response = self.post(self.jobs_url, submit_data)
+        self.post(self.jobs_url, submit_data)
 
         webhook_data = callback_server.stop()
         pprint.pprint(webhook_data)
@@ -57,7 +58,7 @@ class TestWebhooks(BaseAPITest):
         }
         self.update_submit_data(submit_data)
 
-        post_response = self.post(self.jobs_url, submit_data)
+        self.post(self.jobs_url, submit_data)
 
         webhook_data = callback_server.stop()
         pprint.pprint(webhook_data)

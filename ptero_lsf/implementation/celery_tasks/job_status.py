@@ -1,6 +1,5 @@
 from .. import models
 from ptero_lsf.implementation import statuses
-from sqlalchemy import func
 import celery
 import lsf
 

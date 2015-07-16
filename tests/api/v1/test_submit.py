@@ -1,5 +1,4 @@
 from .base import BaseAPITest
-import os
 import pprint
 import time
 

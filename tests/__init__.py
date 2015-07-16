@@ -11,6 +11,7 @@ def mkdir_p(path):
         else:
             raise
 
+
 def setUp():
     if 'PTERO_LSF_TEST_NETWORK_TEMP' in os.environ:
         mkdir_p(os.environ['PTERO_LSF_TEST_NETWORK_TEMP'])
