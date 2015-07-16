@@ -41,6 +41,9 @@
         "webhooks": {
             "type": "object",
             "properties": {
+                "submitted": { "$ref": "#/definitions/webhook_entry" },
+                "suspended": { "$ref": "#/definitions/webhook_entry" },
+                "waiting":   { "$ref": "#/definitions/webhook_entry" },
                 "scheduled": { "$ref": "#/definitions/webhook_entry" },
                 "running":   { "$ref": "#/definitions/webhook_entry" },
                 "succeeded": { "$ref": "#/definitions/webhook_entry" },
