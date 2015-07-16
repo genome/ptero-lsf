@@ -1,7 +1,13 @@
 from . import celery_tasks  # noqa
 from . import models
+from lsf.exceptions import InvalidJob
 from ptero_lsf.implementation import statuses
 import datetime
+import logging
+import lsf
+
+
+LOG = logging.getLogger(__name__)
 
 
 class Backend(object):
@@ -41,3 +47,24 @@ class Backend(object):
         job = self.session.query(models.Job).get(job_id)
         if job:
             return job.as_dict
+
+    def update_job_status(self, job_id):
+        service_job = self.session.query(models.Job).get(job_id)
+
+        if service_job.lsf_job_id is None:
+            service_job.set_status(statuses.errored,
+                    message='LSF job id for job %s is None' % job_id)
+
+        else:
+            lsf_job = lsf.get_job(service_job.lsf_job_id)
+
+            try:
+                job_data = lsf_job.as_dict
+            except InvalidJob as e:
+                LOG.exception(e)
+                self.session.rollback()
+                return
+
+            service_job.update_status(job_data['statuses'])
+
+        self.session.commit()
