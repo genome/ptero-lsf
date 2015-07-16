@@ -1,9 +1,14 @@
 from .. import models
+from lsf.exceptions import InvalidJob
 from ptero_lsf.implementation import statuses
 import celery
+import logging
 import lsf
 
 __all__ = ['UpdateJobStatus']
+
+
+LOG = logging.getLogger(__name__)
 
 
 class UpdateJobStatus(celery.Task):
@@ -19,7 +24,12 @@ class UpdateJobStatus(celery.Task):
         else:
             lsf_job = lsf.get_job(service_job.lsf_job_id)
 
-            job_data = lsf_job.as_dict
+            try:
+                job_data = lsf_job.as_dict
+            except InvalidJob as e:
+                LOG.exception(e)
+                session.rollback()
+                return
 
             service_job.update_status(job_data['statuses'])
 
