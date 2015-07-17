@@ -20,3 +20,9 @@ class TestBackend(unittest.TestCase):
         job = self.session.query(models.Job).get(job_id)
         job.lsf_job_id = 82
         self.assertFalse(self.backend.update_job_status(job_id))
+
+    def test_update_job_without_lsf_id(self):
+        job_id, job_dict = self.backend.create_job('false', user='nobody')
+        job = self.session.query(models.Job).get(job_id)
+        job.lsf_job_id = None
+        self.assertFalse(self.backend.update_job_status(job_id))

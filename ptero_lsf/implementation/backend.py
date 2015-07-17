@@ -54,6 +54,8 @@ class Backend(object):
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
                     message='LSF job id for job %s is None' % job_id)
+            self.session.rollback()
+            return False
 
         else:
             lsf_job = lsf.get_job(service_job.lsf_job_id)
