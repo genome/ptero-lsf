@@ -63,8 +63,9 @@ class Backend(object):
             except InvalidJob as e:
                 LOG.exception(e)
                 self.session.rollback()
-                return
+                return False
 
             service_job.update_status(job_data['statuses'])
 
         self.session.commit()
+        return True
