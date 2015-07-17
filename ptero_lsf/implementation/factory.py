@@ -24,7 +24,8 @@ class Factory(object):
             self._initialized = True
 
     def _initialize_sqlalchemy(self):
-        self._engine = sqlalchemy.create_engine(self.database_url)
+        self._engine = sqlalchemy.create_engine(
+            self.database_url, max_overflow=100)
         models.Base.metadata.create_all(self._engine)
         self._Session = sqlalchemy.orm.sessionmaker(bind=self._engine)
 

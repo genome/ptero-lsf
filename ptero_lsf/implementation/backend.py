@@ -49,8 +49,9 @@ class Backend(object):
             return job.as_dict
 
     def update_job_status(self, job_id):
-        service_job = self.session.query(models.Job).get(job_id)
         LOG.debug('Updating status for service job: %s' % job_id)
+        service_job = self.session.query(
+            models.Job).get(job_id)
         LOG.debug('Serivce job %s has lsf id %s' % (
             job_id, service_job.lsf_job_id))
 

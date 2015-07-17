@@ -1,6 +1,6 @@
 from .. import models
-import celery
 from sqlalchemy import func
+import celery
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -17,6 +17,7 @@ class PollActiveJobs(celery.Task):
         for job_id in job_ids:
             LOG.debug('Scheduling update for job %s' % job_id)
             self.update_job_status.delay(job_id)
+        session.commit()
 
     @property
     def update_job_status(self):
