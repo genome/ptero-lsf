@@ -102,6 +102,7 @@ class Job(Base):
     def as_dict(self):
         result = {
             'command': self.command,
+            'pollingInterval': self.polling_interval.seconds,
             'cwd': self.cwd,
             'environment': self.environment,
             'status': self.latest_status.status,

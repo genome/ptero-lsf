@@ -11,6 +11,7 @@ class SubmitTest(BaseAPITest):
         outfile = self.make_tempfile()
         submit_data = {
             'command': 'echo "%s"' % test_data,
+            'pollingInterval': 3,
             'options': {
                 'outFile': outfile,
             },
