@@ -23,8 +23,10 @@ app.conf['CELERY_ROUTES'] = (
     },
 )
 
+app.conf[BROKER_URL] = os.environ.get('PTERO_LSF_CELERY_BROKER_URL',
+    os.environ.get('CELERY_BROKER_URL', 'amqp://localhost'))
+
 _DEFAULT_CELERY_CONFIG = {
-    'CELERY_BROKER_URL': 'amqp://localhost',
     'CELERY_RESULT_BACKEND': 'redis://localhost',
     'CELERY_ACCEPT_CONTENT': ['json'],
     'CELERY_ACKS_LATE': True,
