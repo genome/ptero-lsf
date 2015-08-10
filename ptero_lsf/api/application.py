@@ -24,6 +24,7 @@ def _create_app_from_blueprints():
 
     return app
 
+
 def _attach_factory_to_app(factory, app):
     @app.before_request
     def before_request():

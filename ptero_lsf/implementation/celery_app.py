@@ -1,7 +1,8 @@
-from celery.signals import worker_init
+from celery.signals import worker_init, setup_logging
+from factory import Factory
+from ptero_common.logging_configuration import configure_celery_logging
 import celery
 import os
-import sqlalchemy
 
 
 TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
@@ -9,9 +10,23 @@ TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
 
 app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
+app.conf['CELERY_ROUTES'] = (
+    {
+        'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask':
+            {'queue': 'lsftask'},
+        'ptero_lsf.implementation.celery_tasks.polling.PollActiveJobs':
+            {'queue': 'poll'},
+        'ptero_lsf.implementation.celery_tasks.job_status.UpdateJobStatus':
+            {'queue': 'update'},
+        'ptero_common.celery.http.HTTP': {'queue': 'http'},
+        'ptero_common.celery.http.HTTPWithResult': {'queue': 'http'},
+    },
+)
+
+app.conf['BROKER_URL'] = os.environ.get('PTERO_LSF_CELERY_BROKER_URL',
+    os.environ.get('CELERY_BROKER_URL', 'amqp://localhost'))
 
 _DEFAULT_CELERY_CONFIG = {
-    'CELERY_BROKER_URL': 'amqp://localhost',
     'CELERY_RESULT_BACKEND': 'redis://localhost',
     'CELERY_ACCEPT_CONTENT': ['json'],
     'CELERY_ACKS_LATE': True,
@@ -34,13 +49,14 @@ app.conf['CELERYBEAT_SCHEDULE'] = {
     },
 }
 
-app.Session = sqlalchemy.orm.sessionmaker()
+
+@setup_logging.connect
+def setup_celery_logging(**kwargs):
+    configure_celery_logging('LSF')
 
 
 @worker_init.connect
 def initialize_sqlalchemy_session(signal, sender):
-    from . import models
-
-    engine = sqlalchemy.create_engine(os.environ['PTERO_LSF_DB_STRING'])
-    models.Base.metadata.create_all(engine)
-    app.Session.configure(bind=engine)
+    app.factory = Factory(
+        database_url=os.environ.get('PTERO_LSF_DB_STRING',
+            'sqlite://'), celery_app=app)

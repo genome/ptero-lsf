@@ -1,5 +1,4 @@
 from .base import BaseAPITest
-import os
 import pprint
 import time
 
@@ -12,6 +11,7 @@ class SubmitTest(BaseAPITest):
         outfile = self.make_tempfile()
         submit_data = {
             'command': 'echo "%s"' % test_data,
+            'pollingInterval': 3,
             'options': {
                 'outFile': outfile,
             },
@@ -19,9 +19,9 @@ class SubmitTest(BaseAPITest):
                 'cpuTime': 1,
             },
             'webhooks': {
-                'error': callback_server.url,
-                'failure': callback_server.url,
-                'success': callback_server.url,
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)

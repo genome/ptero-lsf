@@ -1,5 +1,6 @@
 from .base import Base
 from json_type import JSON
+from ptero_lsf.implementation import statuses
 from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
@@ -15,18 +16,9 @@ __all__ = ['Job']
 
 
 _TERMINAL_STATUSES = {
-    'ERRORED',
-    'FAILED',
-    'SUCCEEDED',
-}
-_WEBHOOK_TO_TRIGGER = {
-    'ERRORED': 'error',
-    'FAILED': 'failure',
-    'RUNNING': 'running',
-    'SCHEDULED': 'scheduled',
-    'SUBMITTED': 'submit',
-    'SUCCEEDED': 'success',
-    'SUSPENDED': 'suspended',
+    statuses.errored,
+    statuses.failed,
+    statuses.succeeded,
 }
 
 
@@ -63,7 +55,7 @@ class Job(Base):
     def set_status(self, status, message=None):
         JobStatusHistory(job=self, status=status, message=message)
         self.update_poll_after()
-        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(status))
+        self.trigger_webhook(status)
 
     def update_status(self, lsf_status_set, message=None):
         current_status = _extract_status(lsf_status_set)
@@ -76,7 +68,7 @@ class Job(Base):
                          message=message)
 
         self.update_poll_after()
-        self.trigger_webhook(_WEBHOOK_TO_TRIGGER.get(current_status))
+        self.trigger_webhook(current_status)
 
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:
@@ -110,6 +102,7 @@ class Job(Base):
     def as_dict(self):
         result = {
             'command': self.command,
+            'pollingInterval': self.polling_interval.seconds,
             'cwd': self.cwd,
             'environment': self.environment,
             'status': self.latest_status.status,
@@ -139,21 +132,21 @@ class Job(Base):
         if webhook_name:
             webhook_url = self.webhooks.get(webhook_name)
             if webhook_url:
-                celery.current_app.tasks[
-'ptero_lsf.implementation.celery_tasks.http_callback.HTTPCallbackTask'
-                ].delay(webhook_url, **self.as_dict)
+                celery.current_app.tasks['ptero_common.celery.http.HTTP'
+                        ].delay('POST', webhook_url, **self.as_dict)
 
 
 _STATUS_MAP = {
-    'DONE': 'SUCCEEDED',
-    'EXIT': 'FAILED',
-    'PEND': 'SCHEDULED',
-    'PSUSP': 'SUSPENDED',
-    'RUN': 'RUNNING',
-    'SSUSP': 'SUSPENDED',
-    'USUSP': 'SUSPENDED',
-    'WAIT': 'WAITING',
+    'DONE': statuses.succeeded,
+    'EXIT': statuses.failed,
+    'PEND': statuses.scheduled,
+    'PSUSP': statuses.suspended,
+    'RUN': statuses.running,
+    'SSUSP': statuses.suspended,
+    'USUSP': statuses.suspended,
+    'WAIT': statuses.waiting,
 }
+
 
 def _extract_status(lsf_status_set):
     for lsf_status, status in _STATUS_MAP.iteritems():

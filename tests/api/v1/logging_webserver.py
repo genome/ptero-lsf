@@ -8,6 +8,8 @@ import sys
 
 
 _RESPONSE_CODES = []
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--stop-after', type=int, default=10)
@@ -20,16 +22,18 @@ def parse_arguments():
 
     return arguments
 
+
 # This isn't great, but it's the best we can do with Flask:
 # http://stackoverflow.com/questions/2838244/get-open-tcp-port-in-python
 # http://stackoverflow.com/questions/5085656/how-to-get-the-current-port-number-in-flask
 def get_open_port():
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('localhost',0))
+    s.bind(('localhost', 0))
     port = s.getsockname()[1]
     s.close()
     return port
+
 
 def next_response_code():
     response_code = _RESPONSE_CODES.pop()
@@ -41,7 +45,7 @@ def next_response_code():
 app = Flask(__name__)
 
 
-@app.route('/', methods=['PUT'])
+@app.route('/', methods=['POST'])
 def log_request():
     print(request.data)
     return '', next_response_code()

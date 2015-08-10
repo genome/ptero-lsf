@@ -41,9 +41,9 @@ class TestLSFSubmitError(BaseAPITest):
         submit_data = {
             'command': 'invalidcommandnamethatcannotbefoundanywhere foo',
             'webhooks': {
-                'error': callback_server.url,
-                'failure': callback_server.url,
-                'success': callback_server.url,
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
             },
         }
         self.update_submit_data(submit_data)
@@ -61,5 +61,5 @@ class TestLSFSubmitError(BaseAPITest):
 
         data = webhook_data[0]
 
-        self.assertEqual(data['statusHistory'][0]['status'], 'NEW')
-        self.assertEqual(data['statusHistory'][1]['status'], 'ERRORED')
+        self.assertEqual(data['statusHistory'][0]['status'], 'new')
+        self.assertEqual(data['statusHistory'][1]['status'], 'errored')

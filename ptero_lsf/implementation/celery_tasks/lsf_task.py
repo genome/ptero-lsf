@@ -1,14 +1,14 @@
 from .. import models
 from multiprocessing import Pipe, Process
-from celery.utils.log import get_task_logger
+from ptero_lsf.implementation import statuses
 import celery
+import logging
 import os
 import re
 
+
+LOG = logging.getLogger(__name__)
 __all__ = ['LSFTask']
-
-
-LOG = get_task_logger(__name__)
 
 
 def _collect_lsf_environment():
@@ -30,18 +30,19 @@ class SubmitError(Exception):
 
 class LSFTask(celery.Task):
     def run(self, job_id):
-        session = celery.current_app.Session()
+        backend = celery.current_app.factory.create_backend()
+        session = backend.session
         service_job = session.query(models.Job).get(job_id)
 
         try:
             lsf_job_id = _fork_and_submit_job(service_job)
 
             service_job.lsf_job_id = lsf_job_id
-            service_job.set_status('SUBMITTED')
+            service_job.set_status(statuses.submitted)
 
         except Exception as e:
             LOG.exception('Error submitting job')
-            service_job.set_status('ERRORED', message=e.message)
+            service_job.set_status(statuses.errored, message=e.message)
 
         session.commit()
 

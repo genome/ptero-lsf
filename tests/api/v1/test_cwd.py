@@ -16,15 +16,16 @@ class TestCwd(BaseAPITest):
                 'outFile': outfile,
             },
             'webhooks': {
-                'error': callback_server.url,
-                'failure': callback_server.url,
-                'success': callback_server.url,
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
             },
             'cwd': cwd,
         }
         self.update_submit_data(submit_data)
 
         response = self.post(self.jobs_url, submit_data)
+        self.assertEqual(response.status_code, 201)
         self.print_response(response)
 
         webhook_data = callback_server.stop()
