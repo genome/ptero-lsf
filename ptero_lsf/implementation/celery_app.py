@@ -1,12 +1,12 @@
 from celery.signals import worker_init, setup_logging
 from factory import Factory
 from ptero_common.logging_configuration import configure_celery_logging
+from ptero_common.celery.utils import get_config_from_env
 import celery
 import os
 
 
 TASK_PATH = 'ptero_lsf.implementation.celery_tasks'
-
 
 app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
@@ -23,24 +23,8 @@ app.conf['CELERY_ROUTES'] = (
     },
 )
 
-app.conf['BROKER_URL'] = os.environ.get('PTERO_LSF_CELERY_BROKER_URL',
-    os.environ.get('CELERY_BROKER_URL', 'amqp://localhost'))
-
-_DEFAULT_CELERY_CONFIG = {
-    'CELERY_RESULT_BACKEND': 'redis://localhost',
-    'CELERY_ACCEPT_CONTENT': ['json'],
-    'CELERY_ACKS_LATE': True,
-    'CELERY_RESULT_SERIALIZER': 'json',
-    'CELERY_TASK_SERIALIZER': 'json',
-    'CELERY_TRACK_STARTED': True,
-    'CELERYD_PREFETCH_MULTIPLIER': 10,
-}
-for var, default in _DEFAULT_CELERY_CONFIG.iteritems():
-    if var in os.environ:
-        app.conf[var] = os.environ[var]
-    else:
-        app.conf[var] = default
-
+config = get_config_from_env('LSF')
+app.conf.update(config)
 
 app.conf['CELERYBEAT_SCHEDULE'] = {
     'choose-jobs-to-poll': {
