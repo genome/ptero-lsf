@@ -1,13 +1,23 @@
 from . import celery_tasks  # noqa
 from . import models
-from lsf.exceptions import InvalidJob
 from ptero_lsf.implementation import statuses
 import datetime
 import logging
-import lsf
+import os
 
 
 LOG = logging.getLogger(__name__)
+
+
+try:
+    import lsf
+    from lsf.exceptions import InvalidJob
+except ImportError as e:
+    if int(os.environ.get("PTERO_LSF_NON_WORKER", "0")):
+        LOG.info("Failed to import lsf library, this is OK since "
+            "this process is not a worker that needs to access lsf")
+    else:
+        raise e
 
 
 class Backend(object):
