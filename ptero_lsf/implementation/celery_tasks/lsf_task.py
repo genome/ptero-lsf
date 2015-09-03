@@ -1,5 +1,5 @@
 from .. import models
-from multiprocessing import Pipe, Process
+from billiard import Pipe, Process
 from ptero_lsf.implementation import statuses
 import celery
 import logging
