@@ -19,7 +19,7 @@ class JobListView(Resource):
 
         job_id, job_data = g.backend.create_job(**data)
 
-        return job_data, 201, {'Location': url_for('job', pk=job_id)}
+        return {'jobId': job_id}, 201, {'Location': url_for('job', pk=job_id)}
 
 
 class JobView(Resource):
