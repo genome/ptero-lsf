@@ -29,6 +29,7 @@ class SubmitTest(BaseAPITest):
         response = self.post(self.jobs_url, submit_data)
         self.print_response(response)
 
+        self.assertIn('jobId', response.DATA)
         self.assertEqual(response.status_code, 201)
 
         time.sleep(5)
