@@ -17,8 +17,10 @@ class TestWebhooks(BaseAPITest):
         self.post(self.jobs_url, submit_data)
 
         webhook_data = callback_server.stop()[0]
+        print pprint.pformat(webhook_data)
 
         self.assertIsInstance(webhook_data['lsfJobId'], int)
+        self.assertIn('jobId', webhook_data)
         self.assertEqual(webhook_data['statusHistory'][0]['status'], 'new')
         self.assertEqual(webhook_data['statusHistory'][1]['status'],
             'submitted')
@@ -43,6 +45,7 @@ class TestWebhooks(BaseAPITest):
         data = webhook_data[-1]
 
         self.assertIsInstance(data['lsfJobId'], int)
+        self.assertIn('jobId', data)
         self.assertEqual(data['statusHistory'][-1]['status'], 'succeeded')
 
     def test_success_and_failure_webhook_with_failure(self):
@@ -65,4 +68,5 @@ class TestWebhooks(BaseAPITest):
         data = webhook_data[-1]
 
         self.assertIsInstance(data['lsfJobId'], int)
+        self.assertIn('jobId', data)
         self.assertEqual(data['statusHistory'][-1]['status'], 'failed')
