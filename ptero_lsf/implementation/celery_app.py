@@ -42,5 +42,4 @@ def setup_celery_logging(**kwargs):
 @worker_init.connect
 def initialize_sqlalchemy_session(signal, sender):
     app.factory = Factory(
-        database_url=os.environ.get('PTERO_LSF_DB_STRING',
-            'sqlite://'), celery_app=app)
+        database_url=os.environ['PTERO_LSF_DB_STRING'], celery_app=app)

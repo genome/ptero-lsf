@@ -8,8 +8,7 @@ __all__ = ['create_app']
 
 
 def create_app():
-    factory = Factory(
-            database_url=os.environ.get('PTERO_LSF_DB_STRING', 'sqlite://'))
+    factory = Factory(database_url=os.environ['PTERO_LSF_DB_STRING'])
 
     app = _create_app_from_blueprints()
 
