@@ -7,8 +7,7 @@ import unittest
 class TestBackend(unittest.TestCase):
 
     def setUp(self):
-        self.factory = Factory(
-            database_url=os.environ.get('PTERO_LSF_DB_STRING', 'sqlite://'))
+        self.factory = Factory(database_url=os.environ['PTERO_LSF_DB_STRING'])
         self.backend = self.factory.create_backend()
 
     @property

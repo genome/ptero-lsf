@@ -1,10 +1,10 @@
 from .base import Base
-from json_type import JSON
 from ptero_lsf.implementation import statuses
 from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.orm import object_session
+from sqlalchemy.dialects.postgresql import JSON
 import celery
 import datetime
 import os
