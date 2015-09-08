@@ -4,12 +4,14 @@ from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.orm import object_session
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.dialects.postgresql import JSON
 import celery
 import datetime
 import os
 import pwd
 import logging
+import uuid
 
 
 LOG = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ _TERMINAL_STATUSES = {
 class Job(Base):
     __tablename__ = 'job'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     command = Column(Text, nullable=False)
     options = Column(JSON)
@@ -115,9 +117,10 @@ class Job(Base):
     def as_dict(self):
         result = {
             'command': self.command,
-            'pollingInterval': self.polling_interval.seconds,
             'cwd': self.cwd,
             'environment': self.environment,
+            'jobId': self.id,
+            'pollingInterval': self.polling_interval.seconds,
             'status': self.latest_status.status,
             'statusHistory': [h.as_dict for h in self.status_history],
             'user': self.user,
@@ -177,7 +180,7 @@ class JobStatusHistory(Base):
     __tablename__ = 'job_status_history'
 
     id = Column(Integer, primary_key=True)
-    job_id = Column(Integer, ForeignKey(Job.id), nullable=False)
+    job_id = Column(UUID(), ForeignKey(Job.id), nullable=False)
     timestamp = Column(DateTime(timezone=True), default=func.now(),
                        nullable=False)
 
