@@ -7,7 +7,9 @@ env:
 
 install: pip install tox
 
-before_script: sudo update-alternatives --install /bin/sh sh /bin/bash 100
+before_script:
+    - sudo update-alternatives --install /bin/sh sh /bin/bash 100
+    - sudo psql -c 'create database ptero_lsf;' -U postgres
 
 script: tox
 
