@@ -7,19 +7,21 @@ from ptero_common.janitors import perform_cleanup
 import os
 
 
-def janitor_factory():
-    janitors = []
-
-    janitors.append(RabbitMQJanitor(os.environ['PTERO_LSF_CELERY_BROKER_URL']))
-    janitors.append(RedisJanitor(os.environ['PTERO_LSF_CELERY_RESULT_BACKEND']))
-    janitors.append(PostgresJanitor(os.environ['PTERO_LSF_DB_STRING']))
-
-    return janitors
-
-
 if __name__ == '__main__':
-    perform_cleanup(janitor_factory=janitor_factory, required_envvars=[
-        'PTERO_LSF_CELERY_BROKER_URL',
-        'PTERO_LSF_CELERY_RESULT_BACKEND',
-        'PTERO_LSF_DB_STRING',
-    ])
+    perform_cleanup(janitor_spec={
+        'postgres': {
+            'required_envvars': ['PTERO_LSF_DB_STRING'],
+            'cleanup_action': lambda: PostgresJanitor(
+                os.environ['PTERO_LSF_DB_STRING']).clean(),
+            },
+        'rabbitmq': {
+            'required_envvars': ['PTERO_LSF_CELERY_BROKER_URL'],
+            'cleanup_action': lambda: RabbitMQJanitor(
+                os.environ['PTERO_LSF_CELERY_BROKER_URL']).clean(),
+            },
+        'redis': {
+            'required_envvars': ['PTERO_LSF_CELERY_RESULT_BACKEND'],
+            'cleanup_action': lambda: RedisJanitor(
+                os.environ['PTERO_LSF_CELERY_RESULT_BACKEND']).clean(),
+            },
+        })
