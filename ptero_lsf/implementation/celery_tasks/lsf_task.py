@@ -51,7 +51,7 @@ def _submit_job(child_pipe, parent_pipe, service_job):
     try:
         parent_pipe.close()
 
-        service_job.set_user()
+        service_job.set_user_and_groups()
 
         service_job.set_environment()
         os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
