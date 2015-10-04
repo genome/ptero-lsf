@@ -17,6 +17,10 @@ import uuid
 LOG = logging.getLogger(__name__)
 
 
+class PreExecFailed(Exception):
+    pass
+
+
 try:
     import lsf
 except ImportError as e:
@@ -109,9 +113,46 @@ class Job(Base):
         if self.umask is not None:
             os.umask(self.umask)
 
-    def set_user(self):
-        pw_ent = pwd.getpwnam(self.user)
-        os.setreuid(pw_ent.pw_uid, pw_ent.pw_uid)
+    @property
+    def process_user(self):
+        return pwd.getpwuid(os.getuid())[0]
+
+    def set_user_and_groups(self):
+        pw_ent = self._get_pw_ent(self.user)
+
+        if self.process_user == 'root':
+            self._set_groups(self.user, pw_ent.pw_gid)
+            self._set_gid(pw_ent.pw_gid)
+            self._set_uid(pw_ent.pw_uid)
+        elif self.process_user != self.user:
+            raise PreExecFailed("Attempted submit job as invalid user (%s),"
+                    " only valid value is (%s)" %
+                    (self.user, self.process_user))
+
+    def _get_pw_ent(self, user):
+        try:
+            pw_ent = pwd.getpwnam(user)
+        except KeyError as e:
+            raise PreExecFailed(e.message)
+        return pw_ent
+
+    def _set_groups(self, user, gid):
+        try:
+            os.initgroups(user, gid)
+        except OSError as e:
+            raise PreExecFailed('Failed to initgroups: ' + e.strerror)
+
+    def _set_gid(self, gid):
+        try:
+            os.setregid(gid, gid)
+        except OSError as e:
+            raise PreExecFailed('Failed to setregid: ' + e.strerror)
+
+    def _set_uid(self, uid):
+        try:
+            os.setreuid(uid, uid)
+        except OSError as e:
+            raise PreExecFailed('Failed to setreuid: ' + e.strerror)
 
     @property
     def as_dict(self):

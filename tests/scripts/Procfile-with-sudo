@@ -1,5 +1,8 @@
 rabbit: RABBITMQ_LOG_BASE=$PWD/$PTERO_LSF_RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE=$PWD/$PTERO_LSF_RABBITMQ_MNESIA_BASE RABBITMQ_NODENAME=$PTERO_LSF_RABBITMQ_NODENAME RABBITMQ_NODE_PORT=$PTERO_LSF_RABBITMQ_NODE_PORT rabbitmq-server
 redis: redis-server --port $PTERO_LSF_REDIS_PORT
-web: CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND python tests/scripts/web_wrapper.py
-worker: sudo CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND coverage run $(which celery) worker -n lsf_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app
-beat: CELERY_BROKER_URL=$PTERO_LSF_CELERY_BROKER_URL CELERY_RESULT_BACKEND=$PTERO_LSF_CELERY_RESULT_BACKEND coverage run $(which celery) beat --schedule var/celerybeat-schedule -A ptero_lsf.implementation.celery_app
+web: coverage run ptero_lsf/api/wsgi.py
+poller: coverage run $(which celery) worker -n Xworker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q poll
+updater: coverage run $(which celery) worker -n Xworker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q update
+worker: sudo -E LD_LIBRARY_PATH=$LD_LIBRARY_PATH $(which coverage) run $(which celery) worker -n lsf_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q lsftask
+http_worker: coverage run $(which celery) worker -n http_worker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q http
+scheduler: celery beat --schedule var/celerybeat-schedule -A ptero_lsf.implementation.celery_app
