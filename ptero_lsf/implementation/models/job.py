@@ -44,7 +44,7 @@ _TERMINAL_STATUSES = {
 class Job(Base):
     __tablename__ = 'job'
 
-    id = Column(UUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(UUID(), primary_key=True)
 
     command = Column(Text, nullable=False)
     options = Column(JSON)
