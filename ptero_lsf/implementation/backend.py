@@ -4,6 +4,7 @@ from ptero_lsf.implementation import statuses
 import datetime
 import logging
 import os
+from pprint import pformat
 
 
 LOG = logging.getLogger(__name__)
@@ -66,19 +67,21 @@ class Backend(object):
             return job.as_dict
 
     def update_job_status(self, job_id):
-        LOG.debug('Updating status for service job: %s' % job_id)
+        LOG.debug('Looking up job (%s) in DB', job_id)
         service_job = self.session.query(
             models.Job).get(job_id)
-        LOG.debug('Serivce job %s has lsf id %s' % (
-            job_id, service_job.lsf_job_id))
+        LOG.debug('DB says Job (%s) has lsf id [%s]',
+            job_id, service_job.lsf_job_id)
 
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
-                    message='LSF job id for job %s is None' % job_id)
+                    message='LSF job id for job (%s) is None' % job_id)
             self.session.rollback()
             return False
 
         else:
+            LOG.info("Querying LSF about job (%s) with lsf id [%s]",
+                    job_id, service_job.lsf_job_id)
             lsf_job = lsf.get_job(service_job.lsf_job_id)
 
             try:
@@ -89,6 +92,8 @@ class Backend(object):
                 self.session.rollback()
                 return False
 
+            LOG.info("Setting status of job (%s) to %s", job_id,
+                    pformat(job_data['statuses']))
             service_job.update_status(job_data['statuses'])
 
         self.session.commit()
