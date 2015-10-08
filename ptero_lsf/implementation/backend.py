@@ -13,12 +13,12 @@ LOG = logging.getLogger(__name__)
 try:
     import lsf
     from lsf.exceptions import InvalidJob
-except ImportError as e:
+except ImportError:
     if int(os.environ.get("PTERO_LSF_NON_WORKER", "0")):
         LOG.info("Failed to import lsf library, this is OK since "
             "this process is not a worker that needs to access lsf")
     else:
-        raise e
+        raise
 
 
 class Backend(object):
@@ -86,7 +86,7 @@ class Backend(object):
 
             try:
                 job_data = lsf_job.as_dict
-            except InvalidJob as e:
+            except InvalidJob:
                 LOG.exception("Exception occured while converting lsf"
                     " job to dictionary")
                 self.session.rollback()
