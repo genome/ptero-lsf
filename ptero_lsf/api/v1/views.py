@@ -26,7 +26,7 @@ class JobListView(Resource):
             return {'error': e.message}, 400
 
         data['job_id'] = job_id
-        job_id, job_data = g.backend.create_job(**data)
+        g.backend.create_job(**data)
 
         LOG.info("Returning 201 in response to request for job (%s)",
                 job_id)
