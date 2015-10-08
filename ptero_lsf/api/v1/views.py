@@ -18,7 +18,9 @@ class JobListView(Resource):
             LOG.debug("Validating JSON body of request for job (%s)", job_id)
             data = validators.get_job_post_data()
         except Exception as e:
-            LOG.exception(e)
+            LOG.exception("Exception occured while validating JSON body of POST"
+                " request to %s from %s for job (%s)", request.url,
+                request.access_route[0], job_id)
             LOG.info("Returning 400 in response to request for job (%s)",
                     job_id)
             return {'error': e.message}, 400

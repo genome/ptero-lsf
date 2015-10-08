@@ -84,7 +84,8 @@ class Backend(object):
             try:
                 job_data = lsf_job.as_dict
             except InvalidJob as e:
-                LOG.exception(e)
+                LOG.exception("Exception occured while converting lsf"
+                    " job to dictionary")
                 self.session.rollback()
                 return False
 
