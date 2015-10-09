@@ -36,14 +36,13 @@ class LSFTask(celery.Task):
         service_job = session.query(models.Job).get(job_id)
 
         try:
-            LOG.info("Forking to submit job (%s)", job_id)
+            LOG.info("Forking to submit job (%s) to lsf", job_id)
             lsf_job_id = _fork_and_submit_job(service_job)
 
             service_job.lsf_job_id = lsf_job_id
             service_job.set_status(statuses.submitted)
 
         except Exception as e:
-            LOG.exception('Error submitting job (%s)', job_id)
             service_job.set_status(statuses.errored, message=e.message)
 
         session.commit()
@@ -66,6 +65,7 @@ def _submit_job(child_pipe, parent_pipe, service_job):
         LOG.info("Job (%s) has lsf id [%s]", service_job.id, lsf_job.job_id)
         child_pipe.send(lsf_job.job_id)
     except Exception as e:
+        LOG.exception("Error submitting job (%s) to lsf", service_job.id)
         child_pipe.send(str(e))
 
     child_pipe.close()
