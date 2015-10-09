@@ -2,6 +2,7 @@ from ptero_lsf.implementation import Factory
 from ptero_lsf.implementation import models
 import os
 import unittest
+import uuid
 
 
 class TestBackend(unittest.TestCase):
@@ -15,13 +16,15 @@ class TestBackend(unittest.TestCase):
         return self.backend.session
 
     def test_update_invalid_job(self):
-        job_id, job_dict = self.backend.create_job('false', user='nobody')
+        job_id = str(uuid.uuid4())
+        self.backend.create_job('false', job_id, user='nobody')
         job = self.session.query(models.Job).get(job_id)
         job.lsf_job_id = 82
         self.assertFalse(self.backend.update_job_status(job_id))
 
     def test_update_job_without_lsf_id(self):
-        job_id, job_dict = self.backend.create_job('false', user='nobody')
+        job_id = str(uuid.uuid4())
+        self.backend.create_job('false', job_id, user='nobody')
         job = self.session.query(models.Job).get(job_id)
         job.lsf_job_id = None
         self.assertFalse(self.backend.update_job_status(job_id))
