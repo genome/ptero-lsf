@@ -2,12 +2,12 @@ from . import celery_tasks  # noqa
 from . import models
 from ptero_lsf.implementation import statuses
 import datetime
-import logging
 import os
 from pprint import pformat
+from ptero_common import nicer_logging
 
 
-LOG = logging.getLogger(__name__)
+LOG = nicer_logging.getLogger(__name__)
 
 
 try:

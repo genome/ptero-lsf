@@ -1,9 +1,11 @@
 import celery
-import logging
+from ptero_common import nicer_logging
+
+
+LOG = nicer_logging.getLogger(__name__)
+
 
 __all__ = ['UpdateJobStatus']
-
-LOG = logging.getLogger(__name__)
 
 
 class UpdateJobStatus(celery.Task):

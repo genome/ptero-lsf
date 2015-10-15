@@ -2,12 +2,14 @@ from .. import models
 from billiard import Pipe, Process
 from ptero_lsf.implementation import statuses
 import celery
-import logging
 import os
 import re
+from ptero_common import nicer_logging
 
 
-LOG = logging.getLogger(__name__)
+LOG = nicer_logging.getLogger(__name__)
+
+
 __all__ = ['LSFTask']
 
 

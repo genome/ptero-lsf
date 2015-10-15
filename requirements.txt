@@ -8,4 +8,4 @@ psycopg2 == 2.6
 redis == 2.10.3
 requests == 2.5.0
 sqlalchemy == 0.9.8
--e git+http://github.com/genome/ptero-common.git@master#egg=ptero_common
+-e git+http://github.com/genome/ptero-common.git@f0e0b0c#egg=ptero_common

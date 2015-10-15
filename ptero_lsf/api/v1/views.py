@@ -1,15 +1,16 @@
 from . import validators
 from flask import g, request, url_for
 from flask.ext.restful import Resource
-from ptero_common.logging_configuration import logged_response
-import logging
+from ptero_common import nicer_logging
+from ptero_common.nicer_logging import logged_response
 import uuid
 
 
-LOG = logging.getLogger(__name__)
+LOG = nicer_logging.getLogger(__name__)
 
 
 class JobListView(Resource):
+    @logged_response(logger=LOG)
     def post(self):
         job_id = str(uuid.uuid4())
         LOG.info("Handling POST request to %s from %s for job (%s)",

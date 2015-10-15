@@ -1,9 +1,10 @@
 from .. import models
 from sqlalchemy import func
 import celery
-import logging
+from ptero_common import nicer_logging
 
-LOG = logging.getLogger(__name__)
+
+LOG = nicer_logging.getLogger(__name__)
 
 
 class PollActiveJobs(celery.Task):
