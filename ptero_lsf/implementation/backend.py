@@ -49,12 +49,15 @@ class Backend(object):
                 environment=environment, umask=umask, user=user)
         self.session.add(job)
 
-        LOG.debug("Setting status of job (%s) to 'new'", job.id)
+        LOG.debug("Setting status of job (%s) to 'new'", job.id,
+                extra={'jobId': job.id})
         job.set_status(statuses.new)
 
-        LOG.debug("Commiting job (%s) to DB", job.id)
+        LOG.debug("Commiting job (%s) to DB", job.id,
+                extra={'jobId': job.id})
         self.session.commit()
-        LOG.debug("Job (%s) committed to DB", job.id)
+        LOG.debug("Job (%s) committed to DB", job.id,
+                extra={'jobId': job.id})
 
         LOG.info("Submitting Celery LSFTask for job (%s)",
                 job.id, extra={'jobId': job.id})
@@ -68,11 +71,13 @@ class Backend(object):
             return job.as_dict
 
     def update_job_status(self, job_id):
-        LOG.debug('Looking up job (%s) in DB', job_id)
+        LOG.debug('Looking up job (%s) in DB', job_id,
+                extra={'jobId': job_id})
         service_job = self.session.query(
             models.Job).get(job_id)
         LOG.debug('DB says Job (%s) has lsf id [%s]',
-            job_id, service_job.lsf_job_id)
+                job_id, service_job.lsf_job_id,
+                extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
 
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
