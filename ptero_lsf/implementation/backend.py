@@ -57,7 +57,7 @@ class Backend(object):
         LOG.debug("Job (%s) committed to DB", job.id)
 
         LOG.info("Submitting Celery LSFTask for job (%s)",
-                job.id)
+                job.id, extra={'jobId': job.id})
         self.lsf.delay(job.id)
 
         return job.as_dict
@@ -82,7 +82,8 @@ class Backend(object):
 
         else:
             LOG.info("Querying LSF about job (%s) with lsf id [%s]",
-                    job_id, service_job.lsf_job_id)
+                    job_id, service_job.lsf_job_id,
+                    extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             lsf_job = lsf.get_job(service_job.lsf_job_id)
 
             try:
@@ -94,7 +95,8 @@ class Backend(object):
                 return False
 
             LOG.info("Setting status of job (%s) to %s", job_id,
-                    pformat(job_data['statuses']))
+                    pformat(job_data['statuses']),
+                    extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             service_job.update_status(job_data['statuses'])
 
         self.session.commit()

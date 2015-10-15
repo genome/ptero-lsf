@@ -16,7 +16,8 @@ class PollActiveJobs(celery.Task):
                 .filter(models.Job.poll_after <= func.now()).all()
 
         for job_id, in job_ids:
-            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job_id)
+            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job_id,
+                extra={'jobId': job_id})
             self.update_job_status.delay(job_id)
         session.commit()
 

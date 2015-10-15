@@ -32,13 +32,11 @@ class SubmitError(Exception):
 
 class LSFTask(celery.Task):
     def run(self, job_id):
-        LOG.info("Starting work on job (%s)", job_id)
         backend = celery.current_app.factory.create_backend()
         session = backend.session
         service_job = session.query(models.Job).get(job_id)
 
         try:
-            LOG.info("Forking to submit job (%s) to lsf", job_id)
             lsf_job_id = _fork_and_submit_job(service_job)
 
             service_job.lsf_job_id = lsf_job_id
@@ -62,9 +60,11 @@ def _submit_job(child_pipe, parent_pipe, service_job):
         service_job.set_cwd()
         service_job.set_umask()
 
-        LOG.info("Forked process submitting job (%s) to lsf", service_job.id)
+        LOG.info("Submitting job (%s) to lsf", service_job.id,
+                extra={'jobId': service_job.id})
         lsf_job = service_job.submit()
-        LOG.info("Job (%s) has lsf id [%s]", service_job.id, lsf_job.job_id)
+        LOG.info("Job (%s) has lsf id [%s]", service_job.id, lsf_job.job_id,
+                extra={'jobId': service_job.id, 'lsfJobId': lsf_job.job_id})
         child_pipe.send(lsf_job.job_id)
     except Exception as e:
         LOG.exception("Error submitting job (%s) to lsf", service_job.id)
