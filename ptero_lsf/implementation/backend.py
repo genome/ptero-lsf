@@ -2,12 +2,12 @@ from . import celery_tasks  # noqa
 from . import models
 from ptero_lsf.implementation import statuses
 import datetime
-import logging
 import os
 from pprint import pformat
+from ptero_common import nicer_logging
 
 
-LOG = logging.getLogger(__name__)
+LOG = nicer_logging.getLogger(__name__)
 
 
 try:
@@ -49,15 +49,18 @@ class Backend(object):
                 environment=environment, umask=umask, user=user)
         self.session.add(job)
 
-        LOG.debug("Setting status of job (%s) to 'new'", job.id)
+        LOG.debug("Setting status of job (%s) to 'new'", job.id,
+                extra={'jobId': job.id})
         job.set_status(statuses.new)
 
-        LOG.debug("Commiting job (%s) to DB", job.id)
+        LOG.debug("Commiting job (%s) to DB", job.id,
+                extra={'jobId': job.id})
         self.session.commit()
-        LOG.debug("Job (%s) committed to DB", job.id)
+        LOG.debug("Job (%s) committed to DB", job.id,
+                extra={'jobId': job.id})
 
         LOG.info("Submitting Celery LSFTask for job (%s)",
-                job.id)
+                job.id, extra={'jobId': job.id})
         self.lsf.delay(job.id)
 
         return job.as_dict
@@ -68,11 +71,13 @@ class Backend(object):
             return job.as_dict
 
     def update_job_status(self, job_id):
-        LOG.debug('Looking up job (%s) in DB', job_id)
+        LOG.debug('Looking up job (%s) in DB', job_id,
+                extra={'jobId': job_id})
         service_job = self.session.query(
             models.Job).get(job_id)
         LOG.debug('DB says Job (%s) has lsf id [%s]',
-            job_id, service_job.lsf_job_id)
+                job_id, service_job.lsf_job_id,
+                extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
 
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
@@ -82,7 +87,8 @@ class Backend(object):
 
         else:
             LOG.info("Querying LSF about job (%s) with lsf id [%s]",
-                    job_id, service_job.lsf_job_id)
+                    job_id, service_job.lsf_job_id,
+                    extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             lsf_job = lsf.get_job(service_job.lsf_job_id)
 
             try:
@@ -94,7 +100,8 @@ class Backend(object):
                 return False
 
             LOG.info("Setting status of job (%s) to %s", job_id,
-                    pformat(job_data['statuses']))
+                    pformat(job_data['statuses']),
+                    extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             service_job.update_status(job_data['statuses'])
 
         self.session.commit()
