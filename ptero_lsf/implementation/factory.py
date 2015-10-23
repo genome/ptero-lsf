@@ -50,7 +50,7 @@ class Factory(object):
 
     def _initialize_sqlalchemy(self):
         logging.getLogger('sqlalchemy.engine').setLevel(getattr(logging,
-                os.environ.get('PTERO_WORKFLOW_ORM_LOG_LEVEL', 'WARN').upper()))
+                os.environ.get('PTERO_LSF_ORM_LOG_LEVEL', 'WARN').upper()))
         self._engine = sqlalchemy.create_engine(
             self.database_url, max_overflow=100)
 
