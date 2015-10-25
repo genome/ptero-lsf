@@ -55,5 +55,5 @@ def _submit_job(job_id):
 
     LOG.info("Returning 201 in response to request for job (%s)",
             job_id, extra={'jobId': job_id})
-    return {'jobId': job_id}, 201, {'Location': url_for('job', pk=job_id,
+    return {'jobId': job_id}, 201, {'Location': url_for('.job', pk=job_id,
         _external=True)}
