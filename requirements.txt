@@ -1,12 +1,12 @@
-celery == 3.1.17
+-e git+http://github.com/genome/ptero-common.git@f0e0b0c#egg=ptero_common
 alembic == 0.7.7
+celery == 3.1.17
 flask == 0.10.1
 flask-restful == 0.2.12
-jsonschema == 2.4.0
 gunicorn == 19.1.1
+jsonschema == 2.4.0
 librabbitmq == 1.6.1
 psycopg2 == 2.6
 redis == 2.10.3
 requests == 2.5.0
 sqlalchemy == 0.9.8
--e git+http://github.com/genome/ptero-common.git@f0e0b0c#egg=ptero_common
