@@ -12,13 +12,16 @@ class PollActiveJobs(celery.Task):
         LOG.info('Polling DB for active jobs')
         backend = celery.current_app.factory.create_backend()
         session = backend.session
-        job_ids = session.query(models.Job.id)\
-                .filter(models.Job.poll_after <= func.now()).all()
+        jobs = session.query(models.Job).filter(
+                (models.Job.poll_after <= func.now()) &
+                ~(models.Job.awaiting_update)
+                ).all()
 
-        for job_id, in job_ids:
-            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job_id,
-                extra={'jobId': job_id})
-            self.update_job_status.delay(job_id)
+        for job in jobs:
+            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job.id,
+                extra={'jobId': job.id})
+            self.update_job_status.delay(job.id)
+            job.awaiting_update = True
         session.commit()
 
     @property

@@ -75,6 +75,7 @@ class Backend(object):
                 extra={'jobId': job_id})
         service_job = self.session.query(
             models.Job).get(job_id)
+        service_job.awaiting_update = False
         LOG.debug('DB says Job (%s) has lsf id [%s]',
                 job_id, service_job.lsf_job_id,
                 extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
