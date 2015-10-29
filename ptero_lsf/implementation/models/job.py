@@ -66,6 +66,8 @@ class Job(Base):
 
     awaiting_update = Column(Boolean, default=False, nullable=False,
             index=True)
+    failed_update_count = Column(Integer, default=0, nullable=False,
+            index=True)
 
     @property
     def latest_status(self):

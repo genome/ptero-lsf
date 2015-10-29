@@ -95,6 +95,10 @@ class Backend(object):
             try:
                 job_data = lsf_job.as_dict
             except InvalidJob:
+                # this could happen if you poll too quickly after launching the
+                # job, lets allow for retrying a set number of times.
+                service_job.failed_update_count += 1
+
                 LOG.exception("Exception occured while converting lsf"
                     " job to dictionary")
                 self.session.commit()
