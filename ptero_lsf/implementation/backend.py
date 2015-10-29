@@ -82,7 +82,7 @@ class Backend(object):
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
                     message='LSF job id for job (%s) is None' % job_id)
-            self.session.rollback()
+            self.session.commit()
             return False
 
         else:
@@ -96,7 +96,7 @@ class Backend(object):
             except InvalidJob:
                 LOG.exception("Exception occured while converting lsf"
                     " job to dictionary")
-                self.session.rollback()
+                self.session.commit()
                 return False
 
             LOG.info("Setting status of job (%s) to %s", job_id,
