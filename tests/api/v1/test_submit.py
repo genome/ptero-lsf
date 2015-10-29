@@ -107,3 +107,50 @@ class SubmitTest(BaseAPITest):
             self.assertEqual(status_response.DATA[key], value)
 
         self.assertIsInstance(status_response.DATA['lsfJobId'], int)
+
+    def test_post_job_with_num_processors(self):
+        callback_server = self.create_callback_server([200])
+
+        submit_data = {
+            'command': 'true',
+            'pollingInterval': 3,
+            'options': {
+                'numProcessors': 1,
+            },
+            'rLimits': {
+                'RSS': 100,
+            },
+            'webhooks': {
+                'errored': callback_server.url,
+                'failed': callback_server.url,
+                'succeeded': callback_server.url,
+            },
+        }
+        self.update_submit_data(submit_data)
+
+        response = self.post(self.jobs_url, submit_data)
+        self.print_response(response)
+
+        self.assertIn('jobId', response.DATA)
+        self.assertEqual(response.status_code, 201)
+
+        time.sleep(5)
+
+        status_response = self.get(response.headers['Location'])
+        self.assertEqual(status_response.status_code, 200)
+
+        self.print_response(status_response)
+
+        webhook_data = callback_server.stop()
+        pprint.pprint(webhook_data)
+
+        status_response = self.get(response.headers['Location'])
+        self.assertEqual(status_response.status_code, 200)
+
+        self.print_response(status_response)
+
+        for key, value in submit_data.iteritems():
+            self.assertEqual(status_response.DATA[key], value)
+
+        self.assertIsInstance(status_response.DATA['lsfJobId'], int)
+        self.assertEqual('succeeded', status_response.DATA['status'])
