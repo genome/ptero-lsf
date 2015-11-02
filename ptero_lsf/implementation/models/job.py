@@ -97,8 +97,16 @@ class Job(Base):
                 'poll_after': self.polling_interval + datetime.datetime.now(),
             })
 
+    @property
+    def submit_options(self):
+        # lsf gets mad if numProcessors is set but maxNumProcessors isn't
+        options = dict(self.options)
+        if 'numProcessors' in options and 'maxNumProcessors' not in options:
+            options['maxNumProcessors'] = options['numProcessors']
+        return options
+
     def submit(self):
-        return lsf.submit(str(self.command), options=self.options,
+        return lsf.submit(str(self.command), options=self.submit_options,
                           rlimits=self.rlimits)
 
     def set_cwd(self):
