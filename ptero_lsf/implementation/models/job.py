@@ -99,11 +99,12 @@ class Job(Base):
 
     @property
     def submit_options(self):
-        # lsf gets mad if numProcessors is set but maxNumProcessors isn't
-        options = dict(self.options)
-        if 'numProcessors' in options and 'maxNumProcessors' not in options:
-            options['maxNumProcessors'] = options['numProcessors']
-        return options
+        if self.options is not None:
+            # lsf gets mad if numProcessors is set but maxNumProcessors isn't
+            options = dict(self.options)
+            if 'numProcessors' in options and 'maxNumProcessors' not in options:
+                options['maxNumProcessors'] = options['numProcessors']
+            return options
 
     def submit(self):
         return lsf.submit(str(self.command), options=self.submit_options,
