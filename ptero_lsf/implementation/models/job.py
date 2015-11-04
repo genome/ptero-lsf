@@ -189,7 +189,7 @@ class Job(Base):
             'webhooks': self.webhooks,
         }
 
-        if self.poll_after:
+        if self.poll_after is not None:
             result['pollAfter'] = self.poll_after.isoformat()
 
         if self.umask is not None:
