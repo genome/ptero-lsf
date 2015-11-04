@@ -262,9 +262,11 @@ class JobStatusHistory(Base):
     @property
     def as_dict(self):
         result = {
-            'timestamp': self.timestamp.isoformat(),
             'status': self.status,
         }
+
+        if self.timestamp is not None:
+            result['timestamp'] = self.timestamp.isoformat()
 
         if self.message is not None:
             result['message'] = self.message
