@@ -75,6 +75,7 @@ class Backend(object):
                 extra={'jobId': job_id})
         service_job = self.session.query(
             models.Job).get(job_id)
+        service_job.awaiting_update = False
         LOG.debug('DB says Job (%s) has lsf id [%s]',
                 job_id, service_job.lsf_job_id,
                 extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
@@ -82,7 +83,7 @@ class Backend(object):
         if service_job.lsf_job_id is None:
             service_job.set_status(statuses.errored,
                     message='LSF job id for job (%s) is None' % job_id)
-            self.session.rollback()
+            self.session.commit()
             return False
 
         else:
@@ -94,9 +95,13 @@ class Backend(object):
             try:
                 job_data = lsf_job.as_dict
             except InvalidJob:
+                # this could happen if you poll too quickly after launching the
+                # job, lets allow for retrying a set number of times.
+                service_job.failed_update_count += 1
+
                 LOG.exception("Exception occured while converting lsf"
                     " job to dictionary")
-                self.session.rollback()
+                self.session.commit()
                 return False
 
             LOG.info("Setting status of job (%s) to %s", job_id,

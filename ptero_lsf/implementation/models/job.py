@@ -1,7 +1,7 @@
 from .base import Base
 from ptero_lsf.implementation import statuses
 from sqlalchemy import Column, func
-from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text, Boolean
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import UUID
@@ -63,6 +63,11 @@ class Job(Base):
 
     user = Column(Text, nullable=False, index=True)
     webhooks = Column(JSON, default=lambda: {}, nullable=False)
+
+    awaiting_update = Column(Boolean, default=False, nullable=False,
+            index=True)
+    failed_update_count = Column(Integer, default=0, nullable=False,
+            index=True)
 
     @property
     def latest_status(self):
