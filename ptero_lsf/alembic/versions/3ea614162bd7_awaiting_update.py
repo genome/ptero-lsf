@@ -17,7 +17,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('job', sa.Column('awaiting_update', sa.Boolean(), nullable=False))
+    op.add_column('job', sa.Column('awaiting_update', sa.Boolean(), nullable=True, server_default="FALSE"))
     op.create_index(op.f('ix_job_awaiting_update'), 'job', ['awaiting_update'], unique=False)
 
 

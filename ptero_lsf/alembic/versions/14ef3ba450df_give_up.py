@@ -17,7 +17,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('job', sa.Column('failed_update_count', sa.Integer(), nullable=False))
+    op.add_column('job', sa.Column('failed_update_count', sa.Integer(), nullable=False, server_default="0"))
     op.create_index(op.f('ix_job_failed_update_count'), 'job', ['failed_update_count'], unique=False)
 
 
