@@ -2,13 +2,14 @@
 
 Revision ID: 53dec4636bce
 Revises: 1bd189b92003
+Revises: 14ef3ba450df
 Create Date: 2015-11-04 06:19:23.850932
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '53dec4636bce'
-down_revision = '1bd189b92003'
+down_revision = '14ef3ba450df'
 branch_labels = None
 depends_on = None
 
