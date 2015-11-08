@@ -4,6 +4,7 @@ from ptero_lsf.implementation import statuses
 import datetime
 import os
 from pprint import pformat
+from ptero_common.server_info import get_server_info
 from ptero_common import nicer_logging
 
 
@@ -22,9 +23,10 @@ except ImportError:
 
 
 class Backend(object):
-    def __init__(self, session, celery_app):
+    def __init__(self, session, celery_app, db_revision):
         self.session = session
         self.celery_app = celery_app
+        self.db_revision = db_revision
 
     def cleanup(self):
         self.session.rollback()
@@ -111,3 +113,9 @@ class Backend(object):
 
         self.session.commit()
         return True
+
+    def server_info(self):
+        result = get_server_info(
+                'ptero_lsf.implementation.celery_app')
+        result['databaseRevision'] = self.db_revision
+        return result

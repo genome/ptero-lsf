@@ -30,9 +30,9 @@ class Factory(object):
         self._initialized = False
 
     def create_backend(self):
-        self._initialize()
+        db_revision = self._initialize()
         return backend.Backend(session=self._Session(),
-                celery_app=self.celery_app)
+                celery_app=self.celery_app, db_revision=db_revision)
 
     def _initialize(self):
         # Lazy initialize to be pre-fork friendly.

@@ -57,3 +57,8 @@ def _submit_job(job_id):
             job_id, extra={'jobId': job_id})
     return {'jobId': job_id}, 201, {'Location': url_for('.job', pk=job_id,
         _external=True)}
+
+class ServerInfo(Resource):
+    @logged_response(logger=LOG)
+    def get(self):
+        return g.backend.server_info(), 200
