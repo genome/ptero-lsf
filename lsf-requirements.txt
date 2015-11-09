@@ -1,1 +1,1 @@
--e git+http://github.com/genome/lsf-python.git@511d9aa#egg=lsf
+-e git+http://github.com/genome/lsf-python.git@c376b4b#egg=lsf
