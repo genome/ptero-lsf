@@ -29,7 +29,7 @@ app.conf.update(config)
 app.conf['CELERYBEAT_SCHEDULE'] = {
     'choose-jobs-to-poll': {
         'task': TASK_PATH + '.polling.PollActiveJobs',
-        'schedule': 10,
+        'schedule': int(os.environ.get('PTERO_LSF_POLL_INTERVAL', 10)),
     },
 }
 

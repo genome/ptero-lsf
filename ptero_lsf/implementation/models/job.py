@@ -82,16 +82,24 @@ class Job(Base):
 
     def update_status(self, lsf_status_set, message=None):
         current_status = _extract_status(lsf_status_set)
-        lsf_primary_status = _extract_primary_status(lsf_status_set)
-        lsf_sorted_statuses = sorted(lsf_status_set)
 
-        JobStatusHistory(job=self, status=current_status,
-                         lsf_status_set=lsf_sorted_statuses,
-                         lsf_primary_status=lsf_primary_status,
-                         message=message)
+        last_status_obj = self.latest_status
+        if last_status_obj.status == current_status:
+            if last_status_obj.times_seen is None:
+                last_status_obj.times_seen = 2
+            else:
+                last_status_obj.times_seen += 1
+        else:
+            lsf_primary_status = _extract_primary_status(lsf_status_set)
+            lsf_sorted_statuses = sorted(lsf_status_set)
+
+            JobStatusHistory(job=self, status=current_status,
+                             lsf_status_set=lsf_sorted_statuses,
+                             lsf_primary_status=lsf_primary_status,
+                             message=message)
+            self.trigger_webhook(current_status)
 
         self.update_poll_after()
-        self.trigger_webhook(current_status)
 
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:
@@ -181,7 +189,7 @@ class Job(Base):
             'webhooks': self.webhooks,
         }
 
-        if self.poll_after:
+        if self.poll_after is not None:
             result['pollAfter'] = self.poll_after.isoformat()
 
         if self.umask is not None:
@@ -237,6 +245,9 @@ class JobStatusHistory(Base):
     job_id = Column(UUID(), ForeignKey(Job.id), nullable=False)
     timestamp = Column(DateTime(timezone=True), default=func.now(),
                        nullable=False)
+    last_updated = Column(DateTime(timezone=True), nullable=True,
+            onupdate=func.now())
+    times_seen = Column(Integer, nullable=True)
 
     status = Column(Text, index=True, nullable=False)
 
@@ -251,9 +262,11 @@ class JobStatusHistory(Base):
     @property
     def as_dict(self):
         result = {
-            'timestamp': self.timestamp.isoformat(),
             'status': self.status,
         }
+
+        if self.timestamp is not None:
+            result['timestamp'] = self.timestamp.isoformat()
 
         if self.message is not None:
             result['message'] = self.message
@@ -263,5 +276,11 @@ class JobStatusHistory(Base):
 
         if self.lsf_status_set is not None:
             result['lsfStatusSet'] = self.lsf_status_set
+
+        if self.last_updated is not None:
+            result['lastUpdated'] = self.last_updated.isoformat()
+
+        if self.times_seen is not None:
+            result['timesSeen'] = self.times_seen
 
         return result
