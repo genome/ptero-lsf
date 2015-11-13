@@ -22,11 +22,13 @@ class PollActiveJobs(celery.Task):
                 ).all()
 
         for job in jobs:
+            job.awaiting_update = True
+        session.commit()
+
+        for job in jobs:
             LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job.id,
                 extra={'jobId': job.id})
             self.update_job_status.delay(job.id)
-            job.awaiting_update = True
-        session.commit()
 
     @property
     def update_job_status(self):
