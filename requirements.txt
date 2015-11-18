@@ -1,4 +1,4 @@
--e git+http://github.com/genome/ptero-common.git@43b9503#egg=ptero_common
+-e git+http://github.com/genome/ptero-common.git@d692d45#egg=ptero_common
 alembic == 0.8.3
 celery == 3.1.18
 flask == 0.10.1
