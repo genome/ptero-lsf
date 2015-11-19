@@ -3,6 +3,7 @@ from . import models
 from ptero_lsf.implementation import statuses
 import datetime
 import os
+from sqlalchemy import func
 from pprint import pformat
 from ptero_common.server_info import get_server_info
 from ptero_common import nicer_logging
@@ -10,6 +11,7 @@ from ptero_common import nicer_logging
 
 LOG = nicer_logging.getLogger(__name__)
 
+MAX_FAILS = os.environ.get("PTERO_LSF_MAX_FAILED_UPDATE_ATTEMPTS", 5)
 
 try:
     import lsf
@@ -113,6 +115,24 @@ class Backend(object):
 
         self.session.commit()
         return True
+
+    def get_job_ids_to_update(self):
+        jobs = self.session.query(models.Job).filter(
+                (models.Job.poll_after <= func.now()) &
+                (models.Job.failed_update_count < MAX_FAILS)
+                ).all()
+
+        job_ids_to_update = []
+        for job in jobs:
+            job_ids_to_update.append(job.id)
+            if job.awaiting_update:
+                LOG.warning("Awaiting update already set to True for job (%s)",
+                        job.id, extra={'jobID': job.id})
+            else:
+                job.awaiting_update = True
+        self.session.commit()
+
+        return job_ids_to_update
 
     def server_info(self):
         result = get_server_info(
