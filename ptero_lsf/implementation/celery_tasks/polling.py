@@ -21,14 +21,16 @@ class PollActiveJobs(celery.Task):
                 (models.Job.failed_update_count < MAX_FAILS)
                 ).all()
 
+        job_ids_to_update = []
         for job in jobs:
+            job_ids_to_update.append(job.id)
             job.awaiting_update = True
         session.commit()
 
-        for job in jobs:
-            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job.id,
-                extra={'jobId': job.id})
-            self.update_job_status.delay(job.id)
+        for job_id in job_ids_to_update:
+            LOG.info('Submitting Celery UpdateJobStatus for job (%s)', job_id,
+                extra={'jobId': job_id})
+            self.update_job_status.delay(job_id)
 
     @property
     def update_job_status(self):
