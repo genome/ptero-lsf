@@ -119,14 +119,17 @@ class Backend(object):
     def get_job_ids_to_update(self):
         jobs = self.session.query(models.Job).filter(
                 (models.Job.poll_after <= func.now()) &
-                ~(models.Job.awaiting_update) &
                 (models.Job.failed_update_count < MAX_FAILS)
                 ).all()
 
         job_ids_to_update = []
         for job in jobs:
             job_ids_to_update.append(job.id)
-            job.awaiting_update = True
+            if job.awaiting_update:
+                LOG.warning("Awaiting update already set to True for job (%s)",
+                        job.id, extra={'jobID': job.id})
+            else:
+                job.awaiting_update = True
         self.session.commit()
 
         return job_ids_to_update
