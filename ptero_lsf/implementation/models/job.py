@@ -20,16 +20,6 @@ class PreExecFailed(Exception):
     pass
 
 
-try:
-    import lsf
-except ImportError:
-    if int(os.environ.get("PTERO_LSF_NON_WORKER", "0")):
-        LOG.info("Failed to import lsf library, this is OK since "
-            "this process is not a worker that needs to access lsf")
-    else:
-        raise
-
-
 __all__ = ['Job', 'JobStatusHistory']
 
 
@@ -118,10 +108,6 @@ class Job(Base):
             if 'numProcessors' in options and 'maxNumProcessors' not in options:
                 options['maxNumProcessors'] = options['numProcessors']
             return options
-
-    def submit(self):
-        return lsf.submit(str(self.command), options=self.submit_options,
-                          rlimits=self.rlimits)
 
     def set_cwd(self):
         os.chdir(self.cwd)
