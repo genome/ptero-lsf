@@ -23,11 +23,11 @@ class JobListView(Resource):
 class JobView(Resource):
     @logged_response(logger=LOG)
     def get(self, pk):
-        job_data = g.backend.get_job(pk)
-        if job_data:
+        try:
+            job_data = g.backend.get_job(pk)
             return job_data, 200
-        else:
-            return None, 404
+        except JobNotFoundError as e:
+            return {"error": e.message}, 404
 
     @logged_response(logger=LOG)
     def put(self, pk):

@@ -76,7 +76,12 @@ class Backend(object):
             return job.as_dict
 
     def _get_job(self, job_id):
-        return self.session.query(models.Job).get(job_id)
+        job = self.session.query(models.Job).get(job_id)
+
+        if job is None:
+            raise JobNotFoundError("Job %s not found" % job_id)
+        else:
+            return job
 
     def update_job_status(self, job_id):
         LOG.debug('Looking up job (%s) in DB', job_id,
@@ -146,8 +151,6 @@ class Backend(object):
 
     def update_job(self, job_id, status=None):
         job = self._get_job(job_id)
-        if job is None:
-            raise JobNotFoundError("Job %s not found" % job_id)
 
         if status == statuses.canceled:
             self.cancel_job(job_id, message="Job canceled via PATCH request")
@@ -160,8 +163,6 @@ class Backend(object):
 
     def cancel_job(self, job_id, message):
         job = self._get_job(job_id)
-        if job is None:
-            raise JobNotFoundError("Job %s not found" % job_id)
 
         job.set_status(status=statuses.canceled, message=message)
         self.session.commit()
