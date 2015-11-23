@@ -7,6 +7,7 @@ from sqlalchemy import func
 from pprint import pformat
 from ptero_common.server_info import get_server_info
 from ptero_common import nicer_logging
+from ptero_lsf.exceptions import JobNotFoundError
 
 
 LOG = nicer_logging.getLogger(__name__)
@@ -70,9 +71,12 @@ class Backend(object):
         return job.as_dict
 
     def get_job(self, job_id):
-        job = self.session.query(models.Job).get(job_id)
+        job = self._get_job(job_id)
         if job:
             return job.as_dict
+
+    def _get_job(self, job_id):
+        return self.session.query(models.Job).get(job_id)
 
     def update_job_status(self, job_id):
         LOG.debug('Looking up job (%s) in DB', job_id,
@@ -139,3 +143,37 @@ class Backend(object):
                 'ptero_lsf.implementation.celery_app')
         result['databaseRevision'] = self.db_revision
         return result
+
+    def update_job(self, job_id, status=None):
+        job = self._get_job(job_id)
+        if job is None:
+            raise JobNotFoundError("Job %s not found" % job_id)
+
+        if status == statuses.canceled:
+            self.cancel_job(job_id, message="Job canceled via PATCH request")
+        else:
+            if status is not None:
+                job.set_status(status, message="Updated via PATCH request")
+
+        self.session.commit()
+        return job.as_dict
+
+    def cancel_job(self, job_id, message):
+        job = self._get_job(job_id)
+        if job is None:
+            raise JobNotFoundError("Job %s not found" % job_id)
+
+        job.set_status(status=statuses.canceled, message=message)
+        self.session.commit()
+
+        # done after commit in case job was launched while we were canceling it
+        self._cancel_lsf_job(job)
+
+    def _cancel_lsf_job(self, job):
+        if job.lsf_job_id is not None:
+            lsf.bindings.kill_job(job.lsf_job_id)
+
+    def job_is_canceled(self, job_id):
+        return self.session.query(models.JobStatusHistory).filter(
+                models.JobStatusHistory.job_id == job_id).filter(
+                models.JobStatusHistory.status == statuses.canceled).count() > 0

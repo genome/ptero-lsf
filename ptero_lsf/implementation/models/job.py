@@ -30,7 +30,7 @@ except ImportError:
         raise
 
 
-__all__ = ['Job']
+__all__ = ['Job', 'JobStatusHistory']
 
 
 _TERMINAL_STATUSES = {

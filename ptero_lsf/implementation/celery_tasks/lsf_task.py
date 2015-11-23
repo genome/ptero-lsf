@@ -47,6 +47,10 @@ class LSFTask(celery.Task):
 
         session.commit()
 
+        # done after commit in case job was canceled while we were launching it.
+        if backend.job_is_canceled(job_id):
+            backend._cancel_lsf_job(service_job)
+
 
 def _submit_job(child_pipe, parent_pipe, service_job):
     try:
