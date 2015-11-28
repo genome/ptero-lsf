@@ -5,10 +5,10 @@ from ptero_common import nicer_logging
 LOG = nicer_logging.getLogger(__name__)
 
 
-__all__ = ['LSFTask']
+__all__ = ['LSFSubmit']
 
 
-class LSFTask(celery.Task):
+class LSFSubmit(celery.Task):
     def run(self, job_id):
         LOG.info("Preparing to submit job (%s) to lsf", job_id,
                 extra={'jobId': job_id})

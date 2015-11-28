@@ -54,9 +54,9 @@ class Backend(object):
         self.session.rollback()
 
     @property
-    def lsf(self):
+    def lsf_submit(self):
         return self.celery_app.tasks[
-'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask'
+'ptero_lsf.implementation.celery_tasks.lsf_task.LSFSubmit'
         ]
 
     def create_job(self, command, job_id, options=None, rLimits=None,
@@ -83,9 +83,9 @@ class Backend(object):
         LOG.debug("Job (%s) committed to DB", job.id,
                 extra={'jobId': job.id})
 
-        LOG.info("Submitting Celery LSFTask for job (%s)",
+        LOG.info("Submitting Celery LSFSubmit task for job (%s)",
                 job.id, extra={'jobId': job.id})
-        self.lsf.delay(job.id)
+        self.lsf_submit.delay(job.id)
 
         return job.as_dict
 
