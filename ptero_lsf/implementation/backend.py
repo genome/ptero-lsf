@@ -1,12 +1,15 @@
 from . import celery_tasks  # noqa
 from . import models
+from billiard import Pipe, Process
+from pprint import pformat
+from ptero_common import nicer_logging
+from ptero_common.server_info import get_server_info
+from ptero_lsf.exceptions import JobNotFoundError
 from ptero_lsf.implementation import statuses
+from sqlalchemy import func
 import datetime
 import os
-from sqlalchemy import func
-from pprint import pformat
-from ptero_common.server_info import get_server_info
-from ptero_common import nicer_logging
+import re
 
 
 LOG = nicer_logging.getLogger(__name__)
@@ -22,6 +25,23 @@ except ImportError:
             "this process is not a worker that needs to access lsf")
     else:
         raise
+
+
+def _collect_lsf_environment():
+    regex = re.compile(r'^LSF_.+')
+    result = {}
+    for key, value in os.environ.iteritems():
+        if regex.match(key):
+            result[key] = value
+
+    return result
+
+
+_LSF_ENVIRONMENT_VARIABLES = _collect_lsf_environment()
+
+
+class SubmitError(Exception):
+    pass
 
 
 class Backend(object):
@@ -70,9 +90,87 @@ class Backend(object):
         return job.as_dict
 
     def get_job(self, job_id):
-        job = self.session.query(models.Job).get(job_id)
+        job = self._get_job(job_id)
         if job:
             return job.as_dict
+
+    def _get_job(self, job_id):
+        job = self.session.query(models.Job).get(job_id)
+
+        if job is None:
+            raise JobNotFoundError("Job %s not found" % job_id)
+        else:
+            return job
+
+    def submit_job_to_lsf(self, job_id):
+        job = self._get_job(job_id)
+
+        try:
+            lsf_job_id = self._fork_and_submit_job(job)
+
+            job.lsf_job_id = lsf_job_id
+            job.set_status(statuses.submitted)
+
+        except Exception as e:
+            job.set_status(statuses.errored, message=e.message)
+
+        self.session.commit()
+
+        # done after commit in case job was canceled while we were launching it.
+        if self.job_is_canceled(job_id):
+            self._cancel_lsf_job(job)
+
+    def _fork_and_submit_job(self, job):
+        parent_pipe, child_pipe = Pipe()
+        try:
+            p = Process(target=self._submit_job_to_lsf,
+                        args=(child_pipe, parent_pipe, job,))
+            p.start()
+
+        except:
+            parent_pipe.close()
+            raise
+        finally:
+            child_pipe.close()
+
+        try:
+            p.join()
+
+            result = parent_pipe.recv()
+            if isinstance(result, basestring):
+                raise SubmitError(result)
+
+        except EOFError:
+            raise SubmitError('Unknown exception submitting job')
+        finally:
+            parent_pipe.close()
+
+        return result
+
+    def _submit_job_to_lsf(self, child_pipe, parent_pipe, job):
+        try:
+            parent_pipe.close()
+
+            job.set_user_and_groups()
+
+            job.set_environment()
+            os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
+
+            job.set_cwd()
+            job.set_umask()
+
+            LOG.info("Submitting job (%s) to lsf", job.id,
+                    extra={'jobId': job.id})
+            lsf_job = lsf.submit(str(job.command), options=job.submit_options,
+                          rlimits=job.rlimits)
+            LOG.info("Job (%s) has lsf id [%s]", job.id, lsf_job.job_id,
+                    extra={'jobId': job.id, 'lsfJobId': lsf_job.job_id})
+            child_pipe.send(lsf_job.job_id)
+        except Exception as e:
+            LOG.exception("Error submitting job (%s) to lsf", job.id)
+            child_pipe.send(str(e))
+
+        child_pipe.close()
 
     def update_job_status(self, job_id):
         LOG.debug('Looking up job (%s) in DB', job_id,
@@ -139,3 +237,33 @@ class Backend(object):
                 'ptero_lsf.implementation.celery_app')
         result['databaseRevision'] = self.db_revision
         return result
+
+    def update_job(self, job_id, status=None):
+        job = self._get_job(job_id)
+
+        if status == statuses.canceled:
+            self.cancel_job(job_id, message="Job canceled via PATCH request")
+        else:
+            if status is not None:
+                job.set_status(status, message="Updated via PATCH request")
+
+        self.session.commit()
+        return job.as_dict
+
+    def cancel_job(self, job_id, message):
+        job = self._get_job(job_id)
+
+        job.set_status(status=statuses.canceled, message=message)
+        self.session.commit()
+
+        # done after commit in case job was launched while we were canceling it
+        self._cancel_lsf_job(job)
+
+    def _cancel_lsf_job(self, job):
+        if job.lsf_job_id is not None:
+            lsf.bindings.kill_job(job.lsf_job_id)
+
+    def job_is_canceled(self, job_id):
+        return self.session.query(models.JobStatusHistory).filter(
+                models.JobStatusHistory.job_id == job_id).filter(
+                models.JobStatusHistory.status == statuses.canceled).count() > 0

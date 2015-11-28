@@ -3,6 +3,7 @@ from flask import g, request, url_for
 from flask.ext.restful import Resource
 from ptero_common import nicer_logging
 from ptero_common.nicer_logging import logged_response
+from ptero_lsf.exceptions import JobNotFoundError
 import uuid
 
 
@@ -22,11 +23,11 @@ class JobListView(Resource):
 class JobView(Resource):
     @logged_response(logger=LOG)
     def get(self, pk):
-        job_data = g.backend.get_job(pk)
-        if job_data:
+        try:
+            job_data = g.backend.get_job(pk)
             return job_data, 200
-        else:
-            return None, 404
+        except JobNotFoundError as e:
+            return {"error": e.message}, 404
 
     @logged_response(logger=LOG)
     def put(self, pk):
@@ -34,6 +35,31 @@ class JobView(Resource):
                 request.url, request.access_route[0], pk,
                 extra={'jobId': pk})
         return _submit_job(job_id=pk)
+
+    @logged_response(logger=LOG)
+    def patch(self, pk):
+        LOG.info("Handling PATCH request to %s from %s for job (%s)",
+                request.url, request.access_route[0], pk,
+                extra={'jobId': pk})
+
+        data = request.json
+        patch_keys = set(data.keys())
+        allowed_keys = set(['status'])
+
+        disallowed_keys = patch_keys - allowed_keys
+        if disallowed_keys:
+            return {"error": "Not allowing PATCH of %s" %
+                    str(list(disallowed_keys))}, 400
+
+        try:
+            job_data = g.backend.update_job(pk, **data)
+            return job_data, 200
+        except JobNotFoundError as e:
+            return {"error": e.message}, 404
+        except:
+            LOG.exception("Exception while updating job (%s)", pk,
+                    extra={'jobId': pk})
+            return {"error": "Could not update job"}, 400
 
 
 def _submit_job(job_id):
