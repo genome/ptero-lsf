@@ -59,6 +59,12 @@ class Backend(object):
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFSubmit'
         ]
 
+    @property
+    def lsf_kill(self):
+        return self.celery_app.tasks[
+'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKill'
+        ]
+
     def create_job(self, command, job_id, options=None, rLimits=None,
             webhooks=None, pollingInterval=900, cwd='/tmp', environment=None,
             umask=None, user=None):
@@ -118,7 +124,7 @@ class Backend(object):
 
         # done after commit in case job was canceled while we were launching it.
         if self.job_is_canceled(job_id):
-            self._cancel_lsf_job(job)
+            self.kill_lsf_job(job_id)
 
     def _fork_and_submit_job(self, job):
         parent_pipe, child_pipe = Pipe()
@@ -257,11 +263,12 @@ class Backend(object):
         self.session.commit()
 
         # done after commit in case job was launched while we were canceling it
-        self._cancel_lsf_job(job)
-
-    def _cancel_lsf_job(self, job):
         if job.lsf_job_id is not None:
-            lsf.bindings.kill_job(job.lsf_job_id)
+            self.lsf_kill.delay(job_id)
+
+    def kill_lsf_job(self, job_id):
+        job = self._get_job(job_id)
+        lsf.bindings.kill_job(job.lsf_job_id)
 
     def job_is_canceled(self, job_id):
         return self.session.query(models.JobStatusHistory).filter(

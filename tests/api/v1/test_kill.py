@@ -8,13 +8,13 @@ class KillTest(BaseAPITest):
         final_cb_server = self.create_callback_server([200, 200])
 
         submit_data = {
-            'command': 'sleep 60',
+            'command': 'sleep 8675309',
             'pollingInterval': 3,
             'options': {
                 'numProcessors': 1,
             },
             'rLimits': {
-                'RSS': 10,
+                'RSS': 1000000,
             },
             'webhooks': {
                 'submitted': initial_cb_server.url,
