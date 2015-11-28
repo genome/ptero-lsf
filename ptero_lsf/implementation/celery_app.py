@@ -12,7 +12,9 @@ app = celery.Celery('PTero-LSF-celery', include=TASK_PATH)
 
 app.conf['CELERY_ROUTES'] = (
     {
-        'ptero_lsf.implementation.celery_tasks.lsf_task.LSFTask':
+        'ptero_lsf.implementation.celery_tasks.lsf_task.LSFSubmit':
+            {'queue': 'lsftask'},
+        'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKill':
             {'queue': 'lsftask'},
         'ptero_lsf.implementation.celery_tasks.polling.PollActiveJobs':
             {'queue': 'poll'},
