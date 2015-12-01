@@ -7,7 +7,6 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.dialects.postgresql import JSON
 import celery
-import datetime
 import os
 import pwd
 from ptero_common import nicer_logging
@@ -96,8 +95,9 @@ class Job(Base):
             self.poll_after = None
         else:
             s = object_session(self)
+            now = s.execute(func.now()).first()[0]
             s.query(Job).filter_by(id=self.id).update({
-                'poll_after': self.polling_interval + datetime.datetime.now(),
+                'poll_after': now + self.polling_interval,
             })
 
     @property
