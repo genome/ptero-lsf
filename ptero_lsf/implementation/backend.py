@@ -66,9 +66,11 @@ class Backend(object):
         ]
 
     def create_job(self, command, job_id, options=None, rLimits=None,
-            webhooks=None, pollingInterval=900, cwd='/tmp', environment=None,
+            webhooks=None, pollingInterval=None, cwd='/tmp', environment=None,
             umask=None, user=None):
-        polling_interval = datetime.timedelta(seconds=pollingInterval)
+
+        polling_interval = datetime.timedelta(
+                seconds=_determine_polling_interval(pollingInterval))
 
         if umask is not None:
             umask = int(umask, 8)
@@ -94,6 +96,13 @@ class Backend(object):
         self.lsf_submit.delay(job.id)
 
         return job.as_dict
+
+    def _determine_polling_interval(pollingInterval):
+        if pollingIntervalue is None:
+            return int(os.environ.get("PTERO_LSF_DEFAULT_POLLING_INTERVAL",
+                "900"))
+        else:
+            return pollingInterval
 
     def get_job(self, job_id):
         job = self._get_job(job_id)
