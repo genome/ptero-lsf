@@ -238,12 +238,13 @@ class Backend(object):
 
         job_ids_to_update = []
         for job in jobs:
-            job_ids_to_update.append(job.id)
             if job.awaiting_update:
-                LOG.warning("Awaiting update already set to True for job (%s)",
+                LOG.error("Awaiting update already set to True for job (%s)",
                         job.id, extra={'jobID': job.id})
             else:
+                job_ids_to_update.append(job.id)
                 job.awaiting_update = True
+
         self.session.commit()
 
         return job_ids_to_update
