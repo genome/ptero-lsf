@@ -98,12 +98,12 @@ class Backend(object):
         return job.as_dict
 
     @staticmethod
-    def _determine_polling_interval(pollingInterval):
-        if pollingInterval is None:
+    def _determine_polling_interval(polling_interval):
+        if polling_interval is None:
             return int(os.environ.get("PTERO_LSF_DEFAULT_POLLING_INTERVAL",
                 "900"))
         else:
-            return pollingInterval
+            return polling_interval
 
     def get_job(self, job_id):
         job = self._get_job(job_id)
