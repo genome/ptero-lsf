@@ -70,7 +70,7 @@ class Backend(object):
             umask=None, user=None):
 
         polling_interval = datetime.timedelta(
-                seconds=_determine_polling_interval(pollingInterval))
+                seconds=self._determine_polling_interval(pollingInterval))
 
         if umask is not None:
             umask = int(umask, 8)
