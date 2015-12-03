@@ -99,7 +99,7 @@ class Backend(object):
 
     @staticmethod
     def _determine_polling_interval(pollingInterval):
-        if pollingIntervalue is None:
+        if pollingInterval is None:
             return int(os.environ.get("PTERO_LSF_DEFAULT_POLLING_INTERVAL",
                 "900"))
         else:
