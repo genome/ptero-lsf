@@ -60,7 +60,7 @@
             "properties": {
                 "beginTime": { "type": "integer" },
                 "errFile": { "type": "string" },
-                "group": { "type": "string" },
+                "jobGroup": { "type": "string" },
                 "inFile": { "type": "string" },
                 "jobName": { "type": "string" },
                 "mail_user": { "type": "string" },
