@@ -19,6 +19,9 @@ class LSFSubmit(celery.Task):
             LOG.exception("Exception while trying to submit job (%s) to lsf",
                     job_id, extra={'jobId': job_id})
             raise
+        finally:
+            if backend is not None:
+                backend.cleanup()
 
 
 class LSFKill(celery.Task):
@@ -32,3 +35,6 @@ class LSFKill(celery.Task):
             LOG.exception("Exception while trying to kill job (%s)",
                     job_id, extra={'jobId': job_id})
             raise
+        finally:
+            if backend is not None:
+                backend.cleanup()
