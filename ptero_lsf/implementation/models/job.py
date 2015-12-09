@@ -194,10 +194,13 @@ class Job(Base):
 
     def trigger_webhook(self, webhook_name):
         if webhook_name:
-            webhook_url = self.webhooks.get(webhook_name)
-            if webhook_url:
+            urls = self.webhooks.get(webhook_name)
+            if not isinstance(urls, list):
+                urls = [urls]
+
+            for url in urls:
                 celery.current_app.tasks['ptero_common.celery.http.HTTP'
-                        ].delay('POST', webhook_url, **self.as_dict)
+                        ].delay('POST', url, **self.as_dict)
 
 
 _STATUS_MAP = {
