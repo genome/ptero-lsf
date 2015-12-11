@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import create_engine, pool
+from sqlalchemy import create_engine
 import os
 
 # this is the Alembic Config object, which provides
