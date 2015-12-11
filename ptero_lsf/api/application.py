@@ -41,10 +41,11 @@ def _attach_factory_to_app(factory, app):
             LOG.exception("Exception raised while creating backend")
             raise
         finally:
-            if flask.g.backend is None:
+            if not hasattr(flask.g, 'backend'):
                 LOG.critical("Failed to create backend. Aborting request.")
                 flask.abort(500)
 
     @app.teardown_request
     def teardown_request(exception):
-        flask.g.backend.cleanup()
+        if hasattr(flask.g, 'backend'):
+            flask.g.backend.cleanup()
