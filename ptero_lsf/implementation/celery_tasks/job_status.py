@@ -9,6 +9,8 @@ __all__ = ['UpdateJobStatus']
 
 
 class UpdateJobStatus(celery.Task):
+    ignore_result = True
+
     def run(self, job_id):
         LOG.info('Updating job status for job (%s)', job_id,
                 extra={'jobId': job_id})

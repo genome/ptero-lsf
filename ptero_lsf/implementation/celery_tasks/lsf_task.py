@@ -9,6 +9,8 @@ __all__ = ['LSFSubmit', 'LSFKill']
 
 
 class LSFSubmit(celery.Task):
+    ignore_result = True
+
     def run(self, job_id):
         LOG.info("Preparing to submit job (%s) to lsf", job_id,
                 extra={'jobId': job_id})
@@ -25,6 +27,8 @@ class LSFSubmit(celery.Task):
 
 
 class LSFKill(celery.Task):
+    ignore_result = True
+
     def run(self, job_id):
         LOG.info("Preparing to kill job (%s)", job_id,
                 extra={'jobId': job_id})

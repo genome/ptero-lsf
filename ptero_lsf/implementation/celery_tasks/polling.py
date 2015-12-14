@@ -6,6 +6,8 @@ LOG = nicer_logging.getLogger(__name__)
 
 
 class PollActiveJobs(celery.Task):
+    ignore_result = True
+
     def run(self):
         LOG.info('Polling DB for active jobs')
 
