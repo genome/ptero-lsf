@@ -1,6 +1,6 @@
 from alembic import command
+from alembic.config import Config
 from alembic.script import ScriptDirectory
-from ptero_lsf.alembic.config import alembic_config
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import sessionmaker
 import abc
@@ -39,3 +39,19 @@ def alembic_upgrade(alembic_config, engine):
 def setup_logging():
     logging.getLogger('sqlalchemy.engine').setLevel(getattr(logging,
             os.environ.get('PTERO_LSF_ORM_LOG_LEVEL', 'WARN').upper()))
+
+
+def alembic_config(base_dir, db_string):
+    config = Config()
+    config.set_main_option('version_locations', versions_dir(base_dir))
+    config.set_main_option('script_location', scripts_dir(base_dir))
+    config.set_main_option('url', db_string)
+    return config
+
+
+def scripts_dir(base_dir):
+    return os.path.join(base_dir, 'alembic')
+
+
+def versions_dir(base_dir):
+    return os.path.join(base_dir, 'alembic', 'versions')
