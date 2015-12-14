@@ -1,5 +1,4 @@
 rabbit: RABBITMQ_LOG_BASE=$PWD/$PTERO_LSF_RABBITMQ_LOG_BASE RABBITMQ_MNESIA_BASE=$PWD/$PTERO_LSF_RABBITMQ_MNESIA_BASE RABBITMQ_NODENAME=$PTERO_LSF_RABBITMQ_NODENAME RABBITMQ_NODE_PORT=$PTERO_LSF_RABBITMQ_NODE_PORT rabbitmq-server
-redis: redis-server --port $PTERO_LSF_REDIS_PORT
 web: coverage run ptero_lsf/api/wsgi.py
 poller: coverage run $(which celery) worker -n Xworker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q poll
 updater: coverage run $(which celery) worker -n Xworker.%h.$PORT --pool=eventlet --concurrency 1 -A ptero_lsf.implementation.celery_app -Q update
