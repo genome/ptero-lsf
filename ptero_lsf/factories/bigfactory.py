@@ -1,7 +1,6 @@
 import abc
 from ptero_lsf.factories.celeryfactorymixin import CeleryFactoryMixin
 from ptero_lsf.factories.dbfactorymixin import DBFactoryMixin
-from ptero_lsf.implementation import backend
 
 
 class BigFactory(CeleryFactoryMixin, DBFactoryMixin):
@@ -13,13 +12,17 @@ class BigFactory(CeleryFactoryMixin, DBFactoryMixin):
         self._initialized = False
 
     @abc.abstractproperty
+    def backend(self):
+        pass
+
+    @abc.abstractproperty
     def base_dir(self):
         pass
 
     def create_backend(self):
         self._initialize()
         self.db_revision = self.alembic_db_revision()
-        return backend.Backend(session=self.Session(bind=self.engine),
+        return self.backend(session=self.Session(bind=self.engine),
             celery_app=self.celery_app, db_revision=self.db_revision)
 
     def _initialize(self):
