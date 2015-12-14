@@ -1,4 +1,4 @@
-from ptero_lsf.factories.bigfactory import BigFactory
+from ptero_common.factories.bigfactory import BigFactory
 from ptero_lsf.implementation import backend as _backend
 import os
 
