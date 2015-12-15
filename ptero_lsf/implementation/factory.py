@@ -14,3 +14,8 @@ class Factory(BigFactory):
 
     def base_dir(self):
         return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def _initialize_celery(self):
+        if self.celery_app is None:
+            from ptero_lsf.implementation.celery_app import app
+            self.celery_app = app
