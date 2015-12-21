@@ -38,8 +38,10 @@ def _attach_factory_to_app(factory, app):
         try:
             flask.g.backend = factory.create_backend()
         except:
-            LOG.exception("Exception raised while creating backend")
-            raise
+            LOG.exception("Exception occured while creating backend")
+            return flask.jsonify({
+                "error": "Internal Server Error: could not create backend"
+                }), 500
 
     @app.teardown_request
     def teardown_request(exception):
