@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import create_engine
+import os
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -45,10 +46,7 @@ def run_migrations_online():
     if connectable is None:
         # only create Engine if we don't have a Connection
         # from the outside
-        connectable = engine_from_config(
-            config.get_section(config.config_ini_section),
-            prefix='sqlalchemy.',
-            poolclass=pool.NullPool)
+        connectable = create_engine(os.environ['PTERO_LSF_DB_STRING'])
 
     # when connectable is already a Connection object, calling
     # connect() gives us a *branched connection*.
