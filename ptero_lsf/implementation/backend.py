@@ -219,6 +219,12 @@ class Backend(object):
 
                 LOG.exception("Exception occured while converting lsf"
                     " job to dictionary")
+
+                if (service_job.failed_update_count >= MAX_FAILS):
+                    service_job.set_status(statuses.errored,
+                        message="Failed to update status too many times: %s"
+                            % service_job.failed_update_count)
+
                 self.session.commit()
                 return False
 
