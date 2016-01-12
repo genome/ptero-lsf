@@ -14,7 +14,7 @@ import re
 
 LOG = nicer_logging.getLogger(__name__)
 
-MAX_FAILS = os.environ.get("PTERO_LSF_MAX_FAILED_UPDATE_ATTEMPTS", 5)
+MAX_FAILS = int(os.environ.get("PTERO_LSF_MAX_FAILED_UPDATE_ATTEMPTS", 5))
 
 try:
     import lsf
