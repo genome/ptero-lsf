@@ -35,10 +35,10 @@ class TestLSFUpdateError(BaseAPITest):
 def set_lsf_job_id_to_1(job_id):
     update_job_sql = "update job set lsf_job_id=1 where id='%s'" % job_id
     update_job_command = 'psql -h localhost -U postgres -d ptero_lsf ' \
-        '-c "%s"' % update_job_sql
+        '-c "%s" >/dev/null 2>&1' % update_job_sql
     print update_job_command
     os.system(update_job_command)
 
 
 def kill_lsf_job(lsf_job_id):
-    os.system("bkill %s" % lsf_job_id)
+    os.system("bkill %s >/dev/null 2>&1" % lsf_job_id)
