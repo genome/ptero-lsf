@@ -199,7 +199,9 @@ class Job(Base):
                 urls = [urls]
 
             for url in urls:
-                LOG.info("%s webhook triggering POST to %s", webhook_name, url)
+                LOG.info('Webhook: "%s" for job %s -- %s',
+                        webhook_name, self.id, url,
+                        extra={'jobId': self.id})
                 celery.current_app.tasks['ptero_common.celery.http.HTTP'
                         ].delay('POST', url, **self.as_dict)
 
