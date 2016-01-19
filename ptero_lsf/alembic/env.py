@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from alembic import context
+from ptero_lsf.implementation.models.base import Base
 from sqlalchemy import create_engine
 import os
 
@@ -11,7 +12,6 @@ config = context.config
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from ptero_lsf.implementation.models.base import Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
