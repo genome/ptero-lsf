@@ -191,7 +191,9 @@ class Job(Base):
 
     def trigger_webhook(self, webhook_name):
         if webhook_name:
-            urls = self.webhooks.get(webhook_name, [])
+            webhooks = self.webhooks if self.webhooks is not None else {}
+
+            urls = webhooks.get(webhook_name, [])
             if not isinstance(urls, list):
                 urls = [urls]
 
