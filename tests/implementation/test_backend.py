@@ -24,14 +24,14 @@ class TestBackend(unittest.TestCase):
         self.backend.create_job('false', job_id, user='nobody')
         job = self.session.query(models.Job).get(job_id)
         job.lsf_job_id = 82
-        self.assertFalse(self.backend.update_job_status(job_id))
+        self.assertFalse(self.backend.update_job_with_lsf_status(job_id))
 
     def test_update_job_without_lsf_id(self):
         job_id = str(uuid.uuid4())
         self.backend.create_job('false', job_id, user='nobody')
         job = self.session.query(models.Job).get(job_id)
         job.lsf_job_id = None
-        self.assertFalse(self.backend.update_job_status(job_id))
+        self.assertFalse(self.backend.update_job_with_lsf_status(job_id))
 
     def test_create_and_cancel_job(self):
         job_id = str(uuid.uuid4())
@@ -46,7 +46,7 @@ class TestBackend(unittest.TestCase):
         self.assertTrue(self.backend.job_is_canceled(job_id))
 
         for i in range(20):
-            if self.backend.update_job_status(job_id):
+            if self.backend.update_job_with_lsf_status(job_id):
                 print "job %s has dispatched to lsf" % job_id
                 break
             else:

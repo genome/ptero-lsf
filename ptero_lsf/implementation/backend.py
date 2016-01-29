@@ -5,6 +5,7 @@ from pprint import pformat
 from ptero_common import nicer_logging
 from ptero_common.server_info import get_server_info
 from ptero_lsf.exceptions import JobNotFoundError
+from exceptions import RuntimeError
 from ptero_lsf.implementation import statuses
 from sqlalchemy import func
 import datetime
@@ -188,7 +189,7 @@ class Backend(object):
 
         child_pipe.close()
 
-    def update_job_status(self, job_id):
+    def update_job_with_lsf_status(self, job_id):
         LOG.debug('Looking up job (%s) in DB', job_id,
                 extra={'jobId': job_id})
         service_job = self.session.query(
@@ -261,17 +262,42 @@ class Backend(object):
         result['databaseRevision'] = self.db_revision
         return result
 
-    def update_job(self, job_id, status=None):
+    def update_job(self, job_id, status=None, stdout=None, stderr=None):
         job = self._get_job(job_id)
 
+        if status is not None:
+            LOG.debug('Updating status for job (%s) to [%s]', job.id, status)
+            self.update_job_status(job, status)
+
+        if stdout is not None:
+            LOG.debug('Updating stdout for job (%s) to [%s]', job.id, stdout)
+            self.update_job_stdout(job, stdout)
+
+        if stderr is not None:
+            LOG.debug('Updating stderr for job (%s) to [%s]', job.id, stderr)
+            self.update_job_stderr(job, stderr)
+
+        self.session.commit()
+        return job.as_dict
+
+    def update_job_status(self, job, status):
         if status == statuses.canceled:
-            self.cancel_job(job_id, message="Job canceled via PATCH request")
+            self.cancel_job(job.id, message="Job canceled via PATCH request")
         else:
             if status is not None:
                 job.set_status(status, message="Updated via PATCH request")
 
-        self.session.commit()
-        return job.as_dict
+    def update_job_stdout(self, job, stdout):
+        if job.stdout is None:
+            job.stdout = stdout
+        elif job.stdout != stdout:
+            raise RuntimeError
+
+    def update_job_stderr(self, job, stderr):
+        if job.stderr is None:
+            job.stderr = stderr
+        elif job.stderr != stderr:
+            raise RuntimeError
 
     def cancel_job(self, job_id, message):
         job = self._get_job(job_id)

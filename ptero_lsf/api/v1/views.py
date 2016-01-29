@@ -44,7 +44,7 @@ class JobView(Resource):
 
         data = request.json
         patch_keys = set(data.keys())
-        allowed_keys = set(['status'])
+        allowed_keys = set(['status', 'stdout', 'stderr'])
 
         disallowed_keys = patch_keys - allowed_keys
         if disallowed_keys:

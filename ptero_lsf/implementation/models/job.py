@@ -38,6 +38,9 @@ class Job(Base):
     options = Column(JSON)
     rlimits = Column(JSON)
 
+    stdout = Column(Text)
+    stderr = Column(Text)
+
     cwd = Column(Text, nullable=False)
     environment = Column(JSON, default=dict)
     umask = Column(Integer)
@@ -173,6 +176,8 @@ class Job(Base):
             'statusHistory': [h.as_dict for h in self.status_history],
             'user': self.user,
             'webhooks': self.webhooks,
+            'stdout': self.stdout,
+            'stderr': self.stderr,
         }
 
         if self.poll_after is not None:
@@ -184,6 +189,8 @@ class Job(Base):
         self._conditional_add(result, 'options', 'options')
         self._conditional_add(result, 'rlimits', 'rLimits')
         self._conditional_add(result, 'lsf_job_id', 'lsfJobId')
+#        self._conditional_add(result, 'stdout', 'stdout')
+#        self._conditional_add(result, 'stderr', 'stderr')
 
         return result
 
