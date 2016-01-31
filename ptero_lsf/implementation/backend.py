@@ -275,11 +275,17 @@ class Backend(object):
         return job.as_dict
 
     def update_job_status(self, job, status):
-        if status == statuses.canceled:
-            self.cancel_job(job.id, message="Job canceled via PATCH request")
+        if isinstance(status, basestring):
+            message = "Updated via PATCH request"
         else:
-            if status is not None:
-                job.set_status(status, message="Updated via PATCH request")
+            # status is a two element list [<status>, <message>]
+            message = status[-1]
+            status = status[0]
+
+        if status == statuses.canceled:
+            self.cancel_job(job.id, message=message)
+        else:
+            job.set_status(status, message=message)
 
     def update_job_stdout(self, job, stdout):
         job.stdout = stdout
