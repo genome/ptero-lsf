@@ -75,6 +75,10 @@ class Backend(object):
         if umask is not None:
             umask = int(umask, 8)
 
+        if environment is None:
+            environment = {}
+        environment.update(_LSF_ENVIRONMENT_VARIABLES)
+
         job = models.Job(id=job_id, command=command, options=options,
                 rlimits=rLimits, webhooks=webhooks,
                 polling_interval=polling_interval, cwd=cwd,
@@ -170,7 +174,6 @@ class Backend(object):
             job.set_user_and_groups()
 
             job.set_environment()
-            os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
 
             job.set_cwd()
             job.set_umask()
