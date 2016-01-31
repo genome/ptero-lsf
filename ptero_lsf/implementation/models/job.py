@@ -1,4 +1,6 @@
 from .base import Base
+from sqlalchemy import event
+from sqlalchemy.util import symbol
 from ptero_lsf.implementation import statuses
 from sqlalchemy import Column, func
 from sqlalchemy import DateTime, ForeignKey, Integer, Interval, Text, Boolean
@@ -283,3 +285,21 @@ class JobStatusHistory(Base):
             result['timesSeen'] = self.times_seen
 
         return result
+
+
+@event.listens_for(Job.stderr, 'set')
+def receive_job_stderr(*args, **kwargs):
+    return set_only_once(*args, **kwargs)
+
+
+@event.listens_for(Job.stdout, 'set')
+def receive_job_stdout(*args, **kwargs):
+    return set_only_once(*args, **kwargs)
+
+
+def set_only_once(target, new_value, old_value, initiator):
+    if old_value == new_value:
+        return
+
+    if old_value not in [None, symbol('NEVER_SET'), symbol('NO_VALUE')]:
+        raise AttributeError("Attempted to set an immutable attribute")

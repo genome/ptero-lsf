@@ -5,7 +5,6 @@ from pprint import pformat
 from ptero_common import nicer_logging
 from ptero_common.server_info import get_server_info
 from ptero_lsf.exceptions import JobNotFoundError
-from exceptions import RuntimeError
 from ptero_lsf.implementation import statuses
 from sqlalchemy import func
 import datetime
@@ -269,7 +268,7 @@ class Backend(object):
             if value is not None:
                 LOG.debug('Updating %s for job (%s) to [%s]', key, job.id,
                         value)
-                update_fn = getattr("update_job_%s" % key, self)
+                update_fn = getattr(self, "update_job_%s" % key)
                 update_fn(job, value)
 
         self.session.commit()
@@ -283,16 +282,10 @@ class Backend(object):
                 job.set_status(status, message="Updated via PATCH request")
 
     def update_job_stdout(self, job, stdout):
-        if job.stdout is None:
-            job.stdout = stdout
-        elif job.stdout != stdout:
-            raise RuntimeError
+        job.stdout = stdout
 
     def update_job_stderr(self, job, stderr):
-        if job.stderr is None:
-            job.stderr = stderr
-        elif job.stderr != stderr:
-            raise RuntimeError
+        job.stderr = stderr
 
     def cancel_job(self, job_id, message):
         job = self._get_job(job_id)
