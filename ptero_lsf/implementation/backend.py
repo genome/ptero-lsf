@@ -262,20 +262,15 @@ class Backend(object):
         result['databaseRevision'] = self.db_revision
         return result
 
-    def update_job(self, job_id, status=None, stdout=None, stderr=None):
+    def update_job(self, job_id, **kwargs):
         job = self._get_job(job_id)
 
-        if status is not None:
-            LOG.debug('Updating status for job (%s) to [%s]', job.id, status)
-            self.update_job_status(job, status)
-
-        if stdout is not None:
-            LOG.debug('Updating stdout for job (%s) to [%s]', job.id, stdout)
-            self.update_job_stdout(job, stdout)
-
-        if stderr is not None:
-            LOG.debug('Updating stderr for job (%s) to [%s]', job.id, stderr)
-            self.update_job_stderr(job, stderr)
+        for key, value in kwargs.items():
+            if value is not None:
+                LOG.debug('Updating %s for job (%s) to [%s]', key, job.id,
+                        value)
+                update_fn = getattr("update_job_%s" % key, self)
+                update_fn(job, value)
 
         self.session.commit()
         return job.as_dict
