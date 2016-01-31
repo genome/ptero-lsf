@@ -38,6 +38,9 @@ def _collect_lsf_environment():
 
 
 _LSF_ENVIRONMENT_VARIABLES = _collect_lsf_environment()
+_JOB_URL_BASE = "http://%s:%s/v1/jobs/" % (
+        os.environ['PTERO_LSF_HOST'],
+        os.environ['PTERO_LSF_PORT'])
 
 
 class SubmitError(Exception):
@@ -78,6 +81,7 @@ class Backend(object):
         if environment is None:
             environment = {}
         environment.update(_LSF_ENVIRONMENT_VARIABLES)
+        environment['PTERO_LSF_JOB_URL'] = _JOB_URL_BASE + job_id
 
         job = models.Job(id=job_id, command=command, options=options,
                 rlimits=rLimits, webhooks=webhooks,
