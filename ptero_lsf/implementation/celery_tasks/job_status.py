@@ -16,7 +16,7 @@ class UpdateJobStatus(celery.Task):
                 extra={'jobId': job_id})
         try:
             backend = celery.current_app.factory.create_backend()
-            backend.update_job_status(job_id)
+            backend.update_job_with_lsf_status(job_id)
         except:
             LOG.exception(
                 "Exception while trying to update status for job (%s)",

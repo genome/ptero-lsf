@@ -38,6 +38,9 @@ def _collect_lsf_environment():
 
 
 _LSF_ENVIRONMENT_VARIABLES = _collect_lsf_environment()
+_JOB_URL_BASE = "http://%s:%s/v1/jobs/" % (
+        os.environ['PTERO_LSF_HOST'],
+        os.environ['PTERO_LSF_PORT'])
 
 
 class SubmitError(Exception):
@@ -74,6 +77,11 @@ class Backend(object):
 
         if umask is not None:
             umask = int(umask, 8)
+
+        if environment is None:
+            environment = {}
+        environment.update(_LSF_ENVIRONMENT_VARIABLES)
+        environment['PTERO_LSF_JOB_URL'] = _JOB_URL_BASE + job_id
 
         job = models.Job(id=job_id, command=command, options=options,
                 rlimits=rLimits, webhooks=webhooks,
@@ -171,7 +179,6 @@ class Backend(object):
             job.set_user_and_groups()
 
             job.set_environment()
-            os.environ.update(_LSF_ENVIRONMENT_VARIABLES)
 
             job.set_cwd()
             job.set_umask()
@@ -189,7 +196,7 @@ class Backend(object):
 
         child_pipe.close()
 
-    def update_job_status(self, job_id):
+    def update_job_with_lsf_status(self, job_id):
         LOG.debug('Looking up job (%s) in DB', job_id,
                 extra={'jobId': job_id})
         service_job = self.session.query(
@@ -263,17 +270,37 @@ class Backend(object):
         result['databaseRevision'] = self.db_revision
         return result
 
-    def update_job(self, job_id, status=None):
+    def update_job(self, job_id, **kwargs):
         job = self._get_job(job_id)
 
-        if status == statuses.canceled:
-            self.cancel_job(job_id, message="Job canceled via PATCH request")
-        else:
-            if status is not None:
-                job.set_status(status, message="Updated via PATCH request")
+        for key, value in kwargs.items():
+            if value is not None:
+                LOG.debug('Updating %s for job (%s) to [%s]', key, job.id,
+                        value)
+                update_fn = getattr(self, "update_job_%s" % key)
+                update_fn(job, value)
 
         self.session.commit()
         return job.as_dict
+
+    def update_job_status(self, job, status):
+        if isinstance(status, basestring):
+            message = "Updated via PATCH request"
+        else:
+            # status is a two element list [<status>, <message>]
+            message = status[-1]
+            status = status[0]
+
+        if status == statuses.canceled:
+            self.cancel_job(job.id, message=message)
+        else:
+            job.set_status(status, message=message)
+
+    def update_job_stdout(self, job, stdout):
+        job.stdout = stdout
+
+    def update_job_stderr(self, job, stderr):
+        job.stderr = stderr
 
     def cancel_job(self, job_id, message):
         job = self._get_job(job_id)

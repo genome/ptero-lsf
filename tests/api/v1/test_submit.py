@@ -195,3 +195,31 @@ class SubmitTest(BaseAPITest):
 
         self.assertIsInstance(status_response.DATA['lsfJobId'], int)
         self.assertEqual('succeeded', status_response.DATA['status'])
+
+    def test_posted_job_gets_url_in_env(self):
+        submit_data = {
+            'command': 'true',
+            'pollingInterval': 1,
+        }
+        self.update_submit_data(submit_data)
+
+        response = self.post(self.jobs_url, submit_data)
+        self.print_response(response)
+
+        self.assertIn('jobId', response.DATA)
+        self.assertEqual(response.status_code, 201)
+
+        job_url = response.headers['Location']
+        get_response = self.get(job_url)
+        self.assertEqual(get_response.status_code, 200)
+        self.print_response(get_response)
+
+        self.assertIn('PTERO_LSF_JOB_URL', get_response.DATA['environment'])
+
+        second_get_response = self.get(
+                get_response.DATA['environment']['PTERO_LSF_JOB_URL'])
+        self.assertEqual(second_get_response.status_code, 200)
+        self.print_response(second_get_response)
+
+        self.assertEqual(get_response.DATA['jobId'],
+                second_get_response.DATA['jobId'])
