@@ -66,7 +66,6 @@ class Job(Base):
 
     def set_status(self, status, message=None):
         JobStatusHistory(job=self, status=status, message=message)
-        self.update_poll_after()
         self.trigger_webhook(status)
 
     def update_status(self, lsf_status_set, message=None):
@@ -87,8 +86,6 @@ class Job(Base):
                              lsf_primary_status=lsf_primary_status,
                              message=message)
             self.trigger_webhook(current_status)
-
-        self.update_poll_after()
 
     def update_poll_after(self):
         if self.latest_status.status in _TERMINAL_STATUSES:
@@ -194,7 +191,9 @@ class Job(Base):
 
     def trigger_webhook(self, webhook_name):
         if webhook_name:
-            urls = self.webhooks.get(webhook_name, [])
+            webhooks = self.webhooks if self.webhooks is not None else {}
+
+            urls = webhooks.get(webhook_name, [])
             if not isinstance(urls, list):
                 urls = [urls]
 

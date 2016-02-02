@@ -126,6 +126,7 @@ class Backend(object):
 
             job.lsf_job_id = lsf_job_id
             job.set_status(statuses.submitted)
+            job.update_poll_after()
 
         except Exception as e:
             job.set_status(statuses.errored, message=e.message)
@@ -232,6 +233,7 @@ class Backend(object):
                     pformat(job_data['statuses']),
                     extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             service_job.update_status(job_data['statuses'])
+            service_job.update_poll_after()
 
         self.session.commit()
         return True
