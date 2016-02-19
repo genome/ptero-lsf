@@ -4,6 +4,7 @@ from flask.ext.restful import Resource
 from ptero_common import nicer_logging
 from ptero_common.nicer_logging import logged_response
 from ptero_common.exceptions import NoSuchEntityError
+from ptero_common.view_wrapper import handles_no_such_entity_error
 import uuid
 
 
@@ -22,12 +23,10 @@ class JobListView(Resource):
 
 class JobView(Resource):
     @logged_response(logger=LOG)
+    @handles_no_such_entity_error
     def get(self, pk):
-        try:
-            job_data = g.backend.get_job(pk)
-            return job_data, 200
-        except NoSuchEntityError as e:
-            return {"error": e.message}, 404
+        job_data = g.backend.get_job(pk)
+        return job_data, 200
 
     @logged_response(logger=LOG)
     def put(self, pk):
@@ -37,6 +36,7 @@ class JobView(Resource):
         return _submit_job(job_id=pk)
 
     @logged_response(logger=LOG)
+    @handles_no_such_entity_error
     def patch(self, pk):
         LOG.info("Handling PATCH request to %s from %s for job (%s)",
                 request.url, request.access_route[0], pk,
@@ -54,8 +54,8 @@ class JobView(Resource):
         try:
             job_data = g.backend.update_job(pk, **data)
             return job_data, 200
-        except NoSuchEntityError as e:
-            return {"error": e.message}, 404
+        except NoSuchEntityError:
+            raise
         except:
             LOG.exception("Exception while updating job (%s)", pk,
                     extra={'jobId': pk})
