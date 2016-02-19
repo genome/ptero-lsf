@@ -3,7 +3,7 @@ from flask import g, request, url_for
 from flask.ext.restful import Resource
 from ptero_common import nicer_logging
 from ptero_common.nicer_logging import logged_response
-from ptero_lsf.exceptions import JobNotFoundError
+from ptero_common.exceptions import NoSuchEntityError
 import uuid
 
 
@@ -26,7 +26,7 @@ class JobView(Resource):
         try:
             job_data = g.backend.get_job(pk)
             return job_data, 200
-        except JobNotFoundError as e:
+        except NoSuchEntityError as e:
             return {"error": e.message}, 404
 
     @logged_response(logger=LOG)
@@ -54,7 +54,7 @@ class JobView(Resource):
         try:
             job_data = g.backend.update_job(pk, **data)
             return job_data, 200
-        except JobNotFoundError as e:
+        except NoSuchEntityError as e:
             return {"error": e.message}, 404
         except:
             LOG.exception("Exception while updating job (%s)", pk,
