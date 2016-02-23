@@ -4,7 +4,7 @@ from billiard import Pipe, Process
 from pprint import pformat
 from ptero_common import nicer_logging
 from ptero_common.server_info import get_server_info
-from ptero_lsf.exceptions import JobNotFoundError
+from ptero_common.exceptions import NoSuchEntityError
 from ptero_lsf.implementation import statuses
 from sqlalchemy import func
 import datetime
@@ -122,7 +122,7 @@ class Backend(object):
         job = self.session.query(models.Job).get(job_id)
 
         if job is None:
-            raise JobNotFoundError("Job %s not found" % job_id)
+            raise NoSuchEntityError("Job %s not found" % job_id)
         else:
             return job
 

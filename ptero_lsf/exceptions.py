@@ -1,2 +1,0 @@
-class JobNotFoundError(Exception):
-    pass
