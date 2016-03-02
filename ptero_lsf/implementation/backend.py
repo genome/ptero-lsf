@@ -57,13 +57,13 @@ class Backend(object):
         self.session.rollback()
 
     @property
-    def lsf_submit(self):
+    def celery_submit_lsf_job(self):
         return self.celery_app.tasks[
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFSubmit'
         ]
 
     @property
-    def lsf_kill(self):
+    def celery_kill_lsf_job(self):
         return self.celery_app.tasks[
 'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKill'
         ]
@@ -101,7 +101,7 @@ class Backend(object):
 
         LOG.info("Submitting Celery LSFSubmit task for job (%s)",
                 job.id, extra={'jobId': job.id})
-        self.lsf_submit.delay(job.id)
+        self.celery_submit_lsf_job.delay(job.id)
 
         return job.as_dict
 
@@ -310,7 +310,7 @@ class Backend(object):
 
         # done after commit in case job was launched while we were canceling it
         if job.lsf_job_id is not None:
-            self.lsf_kill.delay(job_id)
+            self.celery_kill_lsf_job.delay(job_id)
 
     def kill_lsf_job(self, job_id):
         job = self._get_job(job_id)
