@@ -63,9 +63,9 @@ class Backend(object):
         ]
 
     @property
-    def celery_kill_lsf_job(self):
+    def celery_kill_lsf_job_by_id(self):
         return self.celery_app.tasks[
-'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKill'
+'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKillByID'
         ]
 
     def create_job(self, command, job_id, options=None, rLimits=None,
@@ -143,7 +143,7 @@ class Backend(object):
 
         # done after commit in case job was canceled while we were launching it.
         if self.job_is_canceled(job_id):
-            self.kill_lsf_job(job_id)
+            self.kill_lsf_job(job.lsf_job_id)
 
     def _fork_and_submit_job(self, job):
         parent_pipe, child_pipe = Pipe()
@@ -310,11 +310,27 @@ class Backend(object):
 
         # done after commit in case job was launched while we were canceling it
         if job.lsf_job_id is not None:
-            self.celery_kill_lsf_job.delay(job_id)
+            LOG.debug("Submitting job to Celery to kill LSF job %s",
+                    job.lsf_job_id, extra={'jobId': job.id})
+            self.celery_kill_lsf_job_by_id.delay(job.id, job.lsf_job_id)
 
-    def kill_lsf_job(self, job_id):
+    def delete_job(self, job_id):
         job = self._get_job(job_id)
-        lsf.bindings.kill_job(job.lsf_job_id)
+        if job.lsf_job_id is not None:
+            LOG.debug("Submitting job to Celery to kill LSF job %s",
+                    job.lsf_job_id, extra={'jobId': job.id})
+            self.celery_kill_lsf_job_by_id.delay(job.id, job.lsf_job_id)
+        self.session.delete(job)
+        self.session.commit()
+
+    def kill_job(self, job_id):
+        """ DEPRECATED: Remove with celery_tasks.lsf_task.LSFKill """
+        job = self._get_job(job_id)
+        return self.kill_lsf_job(job.lsf_job_id)
+
+    def kill_lsf_job(self, lsf_job_id):
+        if lsf_job_id is not None:
+            return lsf.bindings.kill_job(lsf_job_id)
 
     def job_is_canceled(self, job_id):
         return self.session.query(models.JobStatusHistory).filter(

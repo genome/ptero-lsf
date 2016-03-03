@@ -29,6 +29,12 @@ class JobView(Resource):
         return job_data, 200
 
     @logged_response(logger=LOG)
+    @handles_no_such_entity_error
+    def delete(self, pk):
+        g.backend.delete_job(pk)
+        return {"message": "Job %s was deleted" % pk}, 200
+
+    @logged_response(logger=LOG)
     def put(self, pk):
         LOG.info("Handling POST request to %s from %s for job (%s)",
                 request.url, request.access_route[0], pk,
