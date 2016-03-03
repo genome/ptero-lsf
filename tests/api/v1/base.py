@@ -118,6 +118,9 @@ class BaseAPITest(unittest.TestCase):
             headers={'content-type': 'application/json'},
             data=json.dumps(data)))
 
+    def delete(self, url):
+        return _deserialize_response(requests.delete(url))
+
     def update_submit_data(self, submit_data):
         self.set_queue(submit_data)
         self.set_user(submit_data)

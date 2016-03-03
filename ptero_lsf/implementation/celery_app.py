@@ -16,6 +16,8 @@ app.conf['CELERY_ROUTES'] = (
             {'queue': 'lsftask'},
         'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKill':
             {'queue': 'lsftask'},
+        'ptero_lsf.implementation.celery_tasks.lsf_task.LSFKillByID':
+            {'queue': 'lsftask'},
         'ptero_lsf.implementation.celery_tasks.polling.PollActiveJobs':
             {'queue': 'poll'},
         'ptero_lsf.implementation.celery_tasks.job_status.UpdateJobStatus':
