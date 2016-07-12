@@ -63,12 +63,15 @@ class LSFKillByID(celery.Task):
             backend = celery.current_app.factory.create_backend()
             backend.kill_lsf_job(lsf_job_id)
         except Exception as exc:
-            delay = DELAYS[self.request.retries]
-            LOG.exception("Exception while trying to kill job (%s) with lsf "
-                    "job id (%s) retrying in %s seconds.  Attempt %d of %d.",
-                    job_id, lsf_job_id, delay, self.request.retries + 1,
-                    self.max_retries + 1, extra={'jobId': job_id})
-            self.retry(exc=exc, countdown=delay)
+            if "Job has already finished" in exc.message:
+                pass
+            else:
+                delay = DELAYS[self.request.retries]
+                LOG.exception("Exception while trying to kill job (%s) with lsf "
+                        "job id (%s) retrying in %s seconds.  Attempt %d of %d.",
+                        job_id, lsf_job_id, delay, self.request.retries + 1,
+                        self.max_retries + 1, extra={'jobId': job_id})
+                self.retry(exc=exc, countdown=delay)
         finally:
             if backend is not None:
                 backend.cleanup()
