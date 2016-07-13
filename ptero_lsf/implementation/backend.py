@@ -213,7 +213,7 @@ class Backend(object):
             return False
 
         else:
-            LOG.info("Querying LSF about job (%s) with lsf id [%s]",
+            LOG.debug("Querying LSF about job (%s) with lsf id [%s]",
                     job_id, service_job.lsf_job_id,
                     extra={'jobId': job_id, 'lsfJobId': service_job.lsf_job_id})
             lsf_job = lsf.get_job(service_job.lsf_job_id, include_exec_info=False)
