@@ -87,6 +87,7 @@ class Backend(object):
                 rlimits=rLimits, webhooks=webhooks,
                 polling_interval=polling_interval, cwd=cwd,
                 environment=environment, umask=umask, user=user)
+        job.translate_output_paths()
         self.session.add(job)
 
         LOG.debug("Setting status of job (%s) to 'new'", job.id,
