@@ -63,7 +63,7 @@ class LSFKillByID(celery.Task):
             backend = celery.current_app.factory.create_backend()
             backend.kill_lsf_job(lsf_job_id)
         except Exception as exc:
-            if "Job has already finished" in exc.message:
+            if len(exc.args) > 1 and "Job has already finished" in exc.args[-1]:
                 pass
             else:
                 delay = DELAYS[self.request.retries]
