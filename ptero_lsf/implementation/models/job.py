@@ -11,7 +11,6 @@ from sqlalchemy.dialects.postgresql import JSON
 import celery
 import os
 import pwd
-import string
 from ptero_common import nicer_logging
 
 
@@ -122,15 +121,6 @@ class Job(Base):
     def set_umask(self):
         if self.umask is not None:
             os.umask(self.umask)
-
-    def translate_output_paths(self):
-        if self.stdout is not None:
-            self.stdout = self._translate(self.stdout)
-        if self.stderr is not None:
-            self.stderr = self._translate(self.stderr)
-
-    def _translate(self, path):
-        return string.replace(path, '%%JOB_ID%%', self.id)
 
     @property
     def process_user(self):
